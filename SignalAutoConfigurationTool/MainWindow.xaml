@@ -1,0 +1,183 @@
+﻿<Window x:Class="SignalAutoConfigurationTool.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:core="clr-namespace:System;assembly=mscorlib"
+        xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
+        xmlns:local="clr-namespace:SignalAutoConfigurationTool"
+        xmlns:localEIO="clr-namespace:SignalAutoConfigurationTool.EIO"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="800" Name="thisWindow" Width="1024" Loaded="Window_Loaded" Closing="Window_Closing" Closed="Window_Closed" WindowState="Maximized">
+    
+    <Window.Resources>
+        <ObjectDataProvider x:Key="SignalType" MethodName="GetValues" ObjectType="{x:Type core:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type Type="localEIO:SignalType"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider> 
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0" >
+            <MenuItem Header="Controller" >
+                <MenuItem Name="MenuItem_Connect" Header="Connect" ToolTip="Connect to a real or virtual controller"   Click="MenuItem_Connect_Click"/>
+                <MenuItem Name="MenuItem_SystemGuid" Header="SystemGuid"  ToolTip="Set the default controller's system guid" Click="MenuItem_SystemGuid_Click" />
+            </MenuItem>
+        </Menu>
+        <Grid  Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" ></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Row="0" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height ="Auto"></RowDefinition>
+                    <RowDefinition Height ="*"></RowDefinition>
+                    <RowDefinition Height ="Auto"></RowDefinition>
+                    <RowDefinition Height ="200"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" >I/O System:</Label>
+                <TreeView  Name="tree_Devices" Grid.Row="1" Grid.Column="0" SelectedItemChanged="tree_Devices_SelectedItemChanged" >
+                </TreeView>
+
+                <GridSplitter Height ="3"  Grid.Row="2"  Grid.Column="0" VerticalAlignment="Center"  ></GridSplitter>
+
+                <ListView Name="listView_attribute" Grid.Row="3" Grid.Column="0"  >
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Attribute" Width="150" DisplayMemberBinding="{Binding Path=attribute}"/>
+                            <GridViewColumn  Header="Value" Width="150" DisplayMemberBinding="{Binding Path=value}"/>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Name="menu_attributeModify"  Header="Modify"  ></MenuItem>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                </ListView>
+            </Grid>
+
+            <GridSplitter Width="3"  Grid.Row="0"  Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" ></GridSplitter>
+
+            <Grid Grid.Row="0" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height ="Auto"></RowDefinition>
+                    <RowDefinition Height ="*"></RowDefinition>
+                    <RowDefinition Height ="Auto"></RowDefinition>
+                    <RowDefinition Height="200"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Label x:Name="label_signalsTarget" Grid.Row="0" Grid.Column="0" >Signals:</Label>
+
+                <DataGrid Name="dataGrid_signals" CanUserSortColumns="False" AutoGenerateColumns="False" CanUserAddRows="True"  Grid.Row="1" Grid.Column="0">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Path=Name}" ></DataGridTextColumn>
+                        <DataGridTextColumn Header="Index"  Binding="{Binding Path=Index}"></DataGridTextColumn>
+                        <DataGridComboBoxColumn  Header="SignalType" IsReadOnly="True"  SelectedItemBinding="{Binding SignalType}" ItemsSource="{Binding Source={StaticResource SignalType}}" />
+                        <DataGridTextColumn Header="SignalIdentificationLabel"  Binding="{Binding Path=SignalIdentificationLabel}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="DeviceMapping" Binding="{Binding Path=DeviceMapping}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="NumberOfBits" Binding="{Binding Path=NumberOfBits}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="Category"  Binding="{Binding Path=Category}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="AccessLevel"  IsReadOnly="True"   Binding="{Binding Path=AccessLevel}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="SafeLevel"  IsReadOnly="True"  Binding="{Binding Path=SafeLevel}"></DataGridTextColumn>
+                        <!--<DataGridTextColumn Header="Device" Binding="{Binding Path=AssignedtoDevice.Name}" ></DataGridTextColumn>-->
+                        <!--<DataGridComboBoxColumn  Header="Device">
+                            <DataGridComboBoxColumn.EditingElementStyle>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=FieldBus.ListDevices,ElementName=thisWindow}"></Setter>
+                                    <Setter Property="DisplayMemberPath" Value="Name"></Setter>
+                                    <Setter Property="SelectedItem" Value="{Binding AssignedtoDevice}"></Setter>
+                                </Style>
+                            </DataGridComboBoxColumn.EditingElementStyle>
+                            <DataGridComboBoxColumn.ElementStyle>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="ItemsSource" Value="{Binding Path=FieldBus.ListDevices,ElementName=thisWindow}"></Setter>
+                                    <Setter Property="DisplayMemberPath" Value="Name"></Setter>
+                                    <Setter Property="SelectedItem" Value="{Binding AssignedtoDevice}"></Setter>
+                                </Style>
+                            </DataGridComboBoxColumn.ElementStyle>
+                        </DataGridComboBoxColumn>-->
+                        <DataGridTextColumn Header="IndustrialNetwork"  IsReadOnly="True"  Binding="{Binding Path=AssignedtoDevice.ConnectedtoIndustrialNetwork.Name}" ></DataGridTextColumn>
+                        <DataGridTextColumn Header="DefaultValue"   Binding="{Binding Path=DefaultValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="FilterTimeActive"  IsReadOnly="True"   Binding="{Binding Path=FilterTimeActive}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="FilterTimePassive"  IsReadOnly="True"   Binding="{Binding Path=FilterTimePassive}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="InvertPhysicalValue"    Binding="{Binding Path=InvertPhysicalValue}"></DataGridTextColumn>
+                        <!--<DataGridTextColumn Header="AnalogEncodingType" Binding="{Binding Path=AnalogEncodingType}" ></DataGridTextColumn>-->
+                        <DataGridComboBoxColumn Header="AnalogEncodingType2"  SelectedItemBinding="{Binding Path=AnalogEncodingType}" >
+                            <DataGridComboBoxColumn.ItemsSource>
+                                <col:ArrayList>
+                                    <core:String>TWO_COMP</core:String>
+                                    <core:String>UNSIGNED</core:String>
+                                </col:ArrayList>
+                            </DataGridComboBoxColumn.ItemsSource>                      
+                        </DataGridComboBoxColumn>
+                        <DataGridTextColumn Header="MaximumLogicalValue"  Binding="{Binding Path=MaximumLogicalValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MaximumPhysicalValue"  Binding="{Binding Path=MaximumPhysicalValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MaximumPhysicalValueLimit"  Binding="{Binding Path=MaximumPhysicalValueLimit}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MaximumBitValue"  Binding="{Binding Path=MaximumBitValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MinimumLogicalValue"  Binding="{Binding Path=MinimumLogicalValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MinimumPhysicalValue"  Binding="{Binding Path=MinimumPhysicalValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MinimumPhysicalValueLimit"  Binding="{Binding Path=MinimumPhysicalValueLimit}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="MinimumBitValue"  Binding="{Binding Path=MinimumBitValue}"></DataGridTextColumn>
+                      </DataGrid.Columns>
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Name="menu_FrozenColumn"  Header="FrozenColumn" Click="menu_FrozenColumn_Click" ></MenuItem>
+                            <MenuItem Name="menu_RefreshSignalIndex"  Header="RefreshSignalIndex" Click="menu_RefreshSignalIndex_Click" ></MenuItem>
+                            <MenuItem Name="menu_ReArrangeSignalDeviceMappingbyIndex"  Header="ReArrangeDeviceMapping" Click="menu_ReArrangeSignalDeviceMappingbyIndex_Click" ></MenuItem>
+                            <MenuItem Name="menu_SaveSignalstoCFG"  Header="SaveSignalstoCFG" Click="menu_SaveSignalstoCFG_Click"  ></MenuItem>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
+                </DataGrid>
+
+                <GridSplitter Height ="3"  Grid.Row="2"  Grid.Column="0" VerticalAlignment="Center"  ></GridSplitter>
+
+                <Grid Grid.Row="3" Grid.Column="0">
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <ListView Name="listView_SWTypeParameter" Grid.Row="0" Grid.Column="0"  >
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="Parameter" Width="100" DisplayMemberBinding="{Binding Path=Id}"/>
+                                <GridViewColumn  Header="Value" Width="100" DisplayMemberBinding="{Binding Path=Value}"/>
+                            </GridView>
+
+                        </ListView.View>
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Name="menu_SWTypeParameterModify"  Header="Modify" ></MenuItem>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                    </ListView>
+               
+                    <ScrollViewer Grid.Row="0" Grid.Column="3" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"   >
+                        <Canvas Name="canvas_laserValue" Margin="10,0,0,0" >
+                        </Canvas>
+                    </ScrollViewer>
+                </Grid>
+
+            </Grid>
+        </Grid>
+        <StatusBar Grid.Row ="2">
+            <StatusBarItem>
+                <Label Name="label_ConnectingStatus">Not connect to the robot</Label>
+            </StatusBarItem>
+            <StatusBarItem>
+                <ProgressBar Width="100" Height="20" Name="progressBar_SocketSend" Visibility="Hidden" >
+                </ProgressBar>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
