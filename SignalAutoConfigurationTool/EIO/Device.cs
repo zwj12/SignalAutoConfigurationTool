@@ -43,6 +43,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return identificationLabel; }
             set { identificationLabel = value; }
         }
+        public string DefaultIdentificationLabel
+        {
+            get { return ""; }
+        }
 
         private string vendorName;
         /// <summary>
@@ -52,6 +56,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return vendorName; }
             set { vendorName = value; }
+        }
+        public string DefaultVendorName
+        {
+            get { return ""; }
         }
 
         private string productName;
@@ -63,10 +71,14 @@ namespace SignalAutoConfigurationTool.EIO
             get { return productName; }
             set { productName = value; }
         }
+        public string DefaultProductName
+        {
+            get { return ""; }
+        }
 
-        private Dictionary<string, SignalBase> signals = new Dictionary<string, EIO.SignalBase>();
+        private Dictionary<string, Signal> signals = new Dictionary<string, EIO.Signal>();
 
-        public Dictionary<string, SignalBase> Signals
+        public Dictionary<string, Signal> Signals
         {
             get { return signals; }
             set { signals = value; }
@@ -102,19 +114,70 @@ namespace SignalAutoConfigurationTool.EIO
 
         public void RefreshSignalIndex()
         {
-            List<SignalBase> signals = this.signals.Values.ToList();
+            List<Signal> signals = this.signals.Values.ToList();
+            //List<string> categories = new List<string>();
             signals.Sort();
             int indexInput = 0;
             int indexOutput = 0;
-            foreach (SignalBase signalbase in signals)
+            int iDeviceMappingNextBit = 0;
+            int oDeviceMappingNextBit = 0;
+            foreach (Signal signalbase in signals)
             {
-                if(signalbase.SignalType== SignalType.DI || signalbase.SignalType == SignalType.GI ||signalbase.SignalType == SignalType.AI)
+                //if(!string.IsNullOrWhiteSpace(signalbase.Category))
+                //{
+                //    if (!categories.Contains(signalbase.Category))
+                //    {
+                //        categories.Add(signalbase.Category);
+                //        signalbase.ReservedDeviceMapping = true;
+                //    }
+                //}
+                if (signalbase.SignalType== SignalType.DI || signalbase.SignalType == SignalType.GI ||signalbase.SignalType == SignalType.AI)
                 {
                     signalbase.Index = indexInput++;
+                    if(signalbase.DeviceMappingFirst!= iDeviceMappingNextBit)
+                    {
+                        signalbase.ReservedDeviceMapping = true;
+                    }
+                    iDeviceMappingNextBit = signalbase.DeviceMappingLast + 1;
                 }
                 else
                 {
                     signalbase.Index = indexOutput++;
+                    if (signalbase.DeviceMappingFirst != oDeviceMappingNextBit)
+                    {
+                        signalbase.ReservedDeviceMapping = true;
+                    }
+                    oDeviceMappingNextBit = signalbase.DeviceMappingLast + 1;
+                }
+            }
+        }
+        public void ResetSignalTypeByName()
+        {
+            foreach (Signal signalbase in signals.Values)
+            {
+                string strPrefix = signalbase.Name.Substring(0, 2).ToUpper();
+                SignalType signalType;
+                if (Enum.TryParse(strPrefix, out signalType))
+                {
+                    if(signalType!= signalbase.SignalType)
+                    {
+                        signalbase.SignalType = signalType;
+                        switch (signalType)
+                        {
+                            case SignalType.DI:
+                            case SignalType.DO:
+                                signalbase.NumberOfBits = 1;
+                                break;
+                            case SignalType.GI:
+                            case SignalType.GO:
+                                signalbase.NumberOfBits = 16;
+                                break;
+                            case SignalType.AI:
+                            case SignalType.AO:
+                                signalbase.NumberOfBits = 16;
+                                break;
+                        }
+                    }
                 }
             }
         }
@@ -124,12 +187,29 @@ namespace SignalAutoConfigurationTool.EIO
         /// </summary>
         public void ReArrangeSignalDeviceMappingbyIndex()
         {
-            List<SignalBase> signals = this.signals.Values.ToList();
+            List<Signal> signals = this.signals.Values.ToList();
             signals.Sort((x, y) => x.Index - y.Index);
             int iDeviceMappingNextBit = 0;
             int oDeviceMappingNextBit = 0;
-            foreach (SignalBase signalbase in signals)
+            foreach (Signal signalbase in signals)
             {
+                if (signalbase.ReservedDeviceMapping)
+                {
+                    if (signalbase.SignalType == SignalType.DI || signalbase.SignalType == SignalType.GI || signalbase.SignalType == SignalType.AI)
+                    {
+                        if(signalbase.DeviceMappingFirst> iDeviceMappingNextBit)
+                        {
+                            iDeviceMappingNextBit = signalbase.DeviceMappingFirst;
+                        }
+                    }
+                    else
+                    {
+                        if (signalbase.DeviceMappingFirst > oDeviceMappingNextBit)
+                        {
+                            oDeviceMappingNextBit = signalbase.DeviceMappingFirst;
+                        }
+                    }
+                }
                 switch (signalbase.SignalType)
                 {
                     case SignalType.DI:
@@ -137,17 +217,23 @@ namespace SignalAutoConfigurationTool.EIO
                         iDeviceMappingNextBit++;
                         break;
                     case SignalType.GI:
-                        if(iDeviceMappingNextBit % 8 != 0)
+                        if (signalbase.AlignmentByte)
                         {
-                            iDeviceMappingNextBit += 8 - iDeviceMappingNextBit % 8;
+                            if(iDeviceMappingNextBit % 8 != 0)
+                            {
+                                iDeviceMappingNextBit += 8 - iDeviceMappingNextBit % 8;
+                            }
                         }
                         signalbase.DeviceMapping =string.Format("{0}-{1}", iDeviceMappingNextBit, iDeviceMappingNextBit+ signalbase.NumberOfBits-1);
                         iDeviceMappingNextBit+= signalbase.NumberOfBits;
                         break;
                     case SignalType.AI:
-                        if (iDeviceMappingNextBit % 8 != 0)
+                        if (signalbase.AlignmentByte)
                         {
-                            iDeviceMappingNextBit += 8 - iDeviceMappingNextBit % 8;
+                            if (iDeviceMappingNextBit % 8 != 0)
+                            {
+                                iDeviceMappingNextBit += 8 - iDeviceMappingNextBit % 8;
+                            }
                         }
                         signalbase.DeviceMapping = string.Format("{0}-{1}", iDeviceMappingNextBit, iDeviceMappingNextBit + signalbase.NumberOfBits - 1);
                         iDeviceMappingNextBit += signalbase.NumberOfBits;
@@ -157,23 +243,34 @@ namespace SignalAutoConfigurationTool.EIO
                         oDeviceMappingNextBit++;
                         break;
                     case SignalType.GO:
-                        if (oDeviceMappingNextBit % 8 != 0)
+                        if (signalbase.AlignmentByte)
                         {
-                            oDeviceMappingNextBit += 8 - oDeviceMappingNextBit % 8;
+                            if (oDeviceMappingNextBit % 8 != 0)
+                            {
+                                oDeviceMappingNextBit += 8 - oDeviceMappingNextBit % 8;
+                            }
                         }
                         signalbase.DeviceMapping = string.Format("{0}-{1}", oDeviceMappingNextBit, oDeviceMappingNextBit + signalbase.NumberOfBits - 1);
                         oDeviceMappingNextBit  += signalbase.NumberOfBits;
                         break;
                     case SignalType.AO:
-                        if (oDeviceMappingNextBit % 8 != 0)
+                        if (signalbase.AlignmentByte)
                         {
-                            oDeviceMappingNextBit += 8 - oDeviceMappingNextBit % 8;
+                            if (oDeviceMappingNextBit % 8 != 0)
+                            {
+                                oDeviceMappingNextBit += 8 - oDeviceMappingNextBit % 8;
+                            }
                         }
                         signalbase.DeviceMapping = string.Format("{0}-{1}", oDeviceMappingNextBit, oDeviceMappingNextBit + signalbase.NumberOfBits - 1);
                         oDeviceMappingNextBit += signalbase.NumberOfBits;
                         break;
                 }
             }
+        }
+
+        public virtual string GetDeviceCFG()
+        {
+            return null;
         }
 
         public void SaveSignalstoCFG()
@@ -190,12 +287,20 @@ namespace SignalAutoConfigurationTool.EIO
             FileStream fs = new FileStream(mySaveFileDialog.FileName, FileMode.Create);
             StreamWriter myStreamWriter = new StreamWriter(fs);
             myStreamWriter.Write("EIO:CFG_1.0::\n");
-
+            if(this is DeviceNetDevice)
+            {
+                myStreamWriter.Write("#\nDEVICENET_DEVICE:\n");
+                myStreamWriter.WriteLine("");
+                myStreamWriter.WriteLine(this.GetDeviceCFG());
+            }
             myStreamWriter.Write("#\nEIO_SIGNAL:\n");
 
-            string strSignalLine= "     ";
-            foreach (SignalBase signalbase in this.Signals.Values)
+            List<Signal> signals = this.signals.Values.ToList();
+            signals.Sort();
+
+            foreach (Signal signalbase in signals)
             {
+                string strSignalLine= "     ";
                 myStreamWriter.Write("\n");
 
                 strSignalLine= WriteCfgLine(myStreamWriter, strSignalLine, "Name", signalbase.Name,signalbase.DefaultName);
@@ -206,12 +311,28 @@ namespace SignalAutoConfigurationTool.EIO
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Label", signalbase.SignalIdentificationLabel, signalbase.DefaultSignalIdentificationLabel);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Access", signalbase.AccessLevel, signalbase.DefaultAccessLevel);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "SafeLevel", signalbase.SafeLevel, signalbase.DefaultSafeLevel);
+                strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Default", signalbase.DefaultValue, signalbase.DefaultDefaultValue);
                 switch (signalbase.SignalType)
                 {
                     case SignalType.DI:
-                        SignalDigitalInput signalDigitalInput = (SignalDigitalInput)signalbase;
-                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Default", signalDigitalInput.DefaultValue,0);
-
+                    case SignalType.DO:
+                    case SignalType.GI:
+                    case SignalType.GO:
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "FiltPas", signalbase.FilterTimePassive, signalbase.DefaultFilterTimePassive);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "FiltAct", signalbase.FilterTimeActive, signalbase.DefaultFilterTimeActive);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Invert", signalbase.InvertPhysicalValue, signalbase.DefaultInvertPhysicalValue);
+                        break;
+                    case SignalType.AI:
+                    case SignalType.AO:
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "EncType", signalbase.AnalogEncodingType, signalbase.DefaultAnalogEncodingType);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MaxLog", signalbase.MaximumLogicalValue, signalbase.DefaultMaximumLogicalValue);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MaxPhys", signalbase.MaximumPhysicalValue, signalbase.DefaultMaximumPhysicalValue);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MaxPhysLimit", signalbase.MaximumPhysicalValueLimit, signalbase.DefaultMaximumPhysicalValueLimit);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MaxBitVal", signalbase.MaximumBitValue, signalbase.DefaultMaximumBitValue);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MinLog", signalbase.MinimumLogicalValue, signalbase.DefaultMinimumLogicalValue);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MinPhys", signalbase.MinimumPhysicalValue, signalbase.DefaultMinimumPhysicalValue);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MinPhysLimit", signalbase.MinimumPhysicalValueLimit, signalbase.DefaultMinimumPhysicalValueLimit);
+                        strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "MinBitVal", signalbase.MinimumBitValue, signalbase.DefaultMinimumBitValue);
                         break;
                 }
 
@@ -283,6 +404,24 @@ namespace SignalAutoConfigurationTool.EIO
             }
             string strIndentation = "     ";
             strSignalParameter = string.Format(" -{0} {1}", strSignalParameter, floatSignalParameterValue);
+            if (strSignalLine.Length + strSignalParameter.Length < 80)
+            {
+                return strSignalLine + strSignalParameter;
+            }
+            else
+            {
+                myStreamWriter.WriteLine(strSignalLine + "\\");
+                return strIndentation + strSignalParameter;
+            }
+        }
+        static public string WriteCfgLine(StreamWriter myStreamWriter, string strSignalLine, string strSignalParameter, int intSignalParameterValue, int intDefaultSignalParameterValue)
+        {
+            if (intSignalParameterValue == intDefaultSignalParameterValue)
+            {
+                return strSignalLine;
+            }
+            string strIndentation = "     ";
+            strSignalParameter = string.Format(" -{0} {1}", strSignalParameter, intSignalParameterValue);
             if (strSignalLine.Length + strSignalParameter.Length < 80)
             {
                 return strSignalLine + strSignalParameter;

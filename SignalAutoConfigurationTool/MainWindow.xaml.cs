@@ -172,7 +172,7 @@ namespace SignalAutoConfigurationTool
             }
             TreeViewItem myTreeViewItem = (TreeViewItem)this.tree_Devices.SelectedItem;
             object obj = myTreeViewItem.Tag;
-            List<SignalBase> signals=null;
+            List<EIO.Signal> signals =null;
 
             if (obj is FieldBus)
             {
@@ -187,7 +187,7 @@ namespace SignalAutoConfigurationTool
                 signals = ((Device)obj).Signals.Values.ToList();
             }
             if (signals != null)
-            {
+            {                
                 signals.Sort();
                 this.dataGrid_signals.ItemsSource = signals;
                 this.dataGrid_signals.Tag = obj;
@@ -213,6 +213,7 @@ namespace SignalAutoConfigurationTool
 
         private void menu_ReArrangeSignalDeviceMappingbyIndex_Click(object sender, RoutedEventArgs e)
         {
+            this.tree_Devices.Focus();
             object obj = this.dataGrid_signals.Tag;
              if (obj is Device)
             {
@@ -226,6 +227,7 @@ namespace SignalAutoConfigurationTool
 
         private void menu_RefreshSignalIndex_Click(object sender, RoutedEventArgs e)
         {
+            this.tree_Devices.Focus();
             object obj = this.dataGrid_signals.Tag;
             if (obj is Device)
             {
@@ -239,6 +241,7 @@ namespace SignalAutoConfigurationTool
 
         private void menu_SaveSignalstoCFG_Click(object sender, RoutedEventArgs e)
         {
+            this.tree_Devices.Focus();
             object obj = this.dataGrid_signals.Tag;
             if (obj is Device)
             {
@@ -249,6 +252,20 @@ namespace SignalAutoConfigurationTool
                 MessageBox.Show("Please select a device!");
             }
 
+        }
+
+        private void menu_ResetSignalTypeByName_Click(object sender, RoutedEventArgs e)
+        {
+            this.tree_Devices.Focus();
+            object obj = this.dataGrid_signals.Tag;
+            if (obj is Device)
+            {
+                ((Device)obj).ResetSignalTypeByName();
+            }
+            else
+            {
+                MessageBox.Show("Please select a device!");
+            }
         }
     }
 }

@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SignalAutoConfigurationTool.EIO
 {
-    public class SignalBase: IComparable<SignalBase>
+    public class Signal: IComparable<Signal>, INotifyPropertyChanged
     {
+        private static string strRegexIdentifier = "^[a-zA-Z_][a-zA-Z0-9_]*$";
+
         private string name;
         /// <summary>
         /// Cfgname:Name
@@ -17,7 +20,20 @@ namespace SignalAutoConfigurationTool.EIO
         public string Name
         {
             get { return name; }
-            set { name = value; }
+            set {
+                if (Regex.IsMatch(value, strRegexIdentifier))
+                {
+                    name = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("Name"));
+                    }
+                }
+                else
+                {
+                    throw new Exception("Name must be a valid identifier");
+                }
+            }
         }
         public string DefaultName
         {
@@ -32,7 +48,13 @@ namespace SignalAutoConfigurationTool.EIO
         public SignalType SignalType
         {
             get { return signalType; }
-            set { signalType = value; }
+            set {
+                signalType = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("SignalType"));
+                }
+            }
         }
         public string DefaultSignalType
         {
@@ -80,14 +102,25 @@ namespace SignalAutoConfigurationTool.EIO
             get { return deviceMapping; }
             set {
                 deviceMapping = value;
-                if(!string.IsNullOrWhiteSpace(value))
+                if (PropertyChanged != null)
                 {
-                    List<int> deviceMappings = SignalBase.GetDeviceMappings(value);
+                    PropertyChanged(this, new PropertyChangedEventArgs("DeviceMapping"));
+                }
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    List<int> deviceMappings = Signal.GetDeviceMappings(value);
                     this.numberOfBits= deviceMappings.Count;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("NumberOfBits"));
+                    }
                     this.deviceMappingFirst = deviceMappings[0];
-                }else
+                    this.deviceMappingLast = deviceMappings[deviceMappings.Count-1];
+                }
+                else
                 {
                     this.deviceMappingFirst = -1;
+                    this.deviceMappingLast = -1;
                 }
             }
         }
@@ -102,6 +135,12 @@ namespace SignalAutoConfigurationTool.EIO
             get { return deviceMappingFirst; }
         }
 
+        private int deviceMappingLast;
+        public int DeviceMappingLast
+        {
+            get { return deviceMappingLast; }
+        }
+
         private int numberOfBits;
         /// <summary>
         /// Cfgname:Size
@@ -114,11 +153,16 @@ namespace SignalAutoConfigurationTool.EIO
             }
             set
             {
-                if(numberOfBits != value && numberOfBits>=1 && numberOfBits<=32)
+                if(numberOfBits != value && value>=1 && value <= 32)
                 {
                     numberOfBits = value;
                     this.deviceMapping = null;
                     this.deviceMappingFirst = -1;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("DeviceMapping"));
+                        PropertyChanged(this, new PropertyChangedEventArgs("NumberOfBits"));
+                    }
                 }
             }
         }
@@ -132,7 +176,13 @@ namespace SignalAutoConfigurationTool.EIO
         public int Index
         {
             get { return index; }
-            set { index = value; }
+            set {
+                index = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Index"));
+                }
+            }
         }
 
         private string category;
@@ -142,7 +192,23 @@ namespace SignalAutoConfigurationTool.EIO
         public string Category
         {
             get { return category; }
-            set { category = value; }
+            set {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    category = value.Trim();
+                }
+                else
+                {
+                    if (Regex.IsMatch(value, strRegexIdentifier))
+                    {
+                        category = value;
+                    }
+                    else
+                    {
+                        throw new Exception("Category must be a valid identifier");
+                    }
+                }       
+            }
         }
         public string DefaultCategory
         {
@@ -193,6 +259,10 @@ namespace SignalAutoConfigurationTool.EIO
                 filterTimePassive = value;
             }
         }
+        public int DefaultFilterTimePassive
+        {
+            get { return 0; }
+        }
 
         private int filterTimeActive;
         /// <summary>
@@ -210,6 +280,10 @@ namespace SignalAutoConfigurationTool.EIO
                 filterTimeActive = value;
             }
         }
+        public int DefaultFilterTimeActive
+        {
+            get { return 0; }
+        }
 
         private bool invertPhysicalValue;
         /// <summary>
@@ -219,6 +293,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return invertPhysicalValue; }
             set { invertPhysicalValue = value; }
+        }
+        public bool DefaultInvertPhysicalValue
+        {
+            get { return false; }
         }
 
         private float defaultValue;
@@ -230,6 +308,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return defaultValue; }
             set { defaultValue = value; }
         }
+        public float DefaultDefaultValue
+        {
+            get { return 0; }
+        }
 
         private string analogEncodingType;
         /// <summary>
@@ -239,6 +321,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return analogEncodingType; }
             set { analogEncodingType = value; }
+        }
+        public string DefaultAnalogEncodingType
+        {
+            get { return "TWO_COMP"; }
         }
 
         private float maximumLogicalValue;
@@ -250,6 +336,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return maximumLogicalValue; }
             set { maximumLogicalValue = value; }
         }
+        public float DefaultMaximumLogicalValue
+        {
+            get { return 0; }
+        }
 
         private float maximumPhysicalValue;
         /// <summary>
@@ -259,6 +349,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return maximumPhysicalValue; }
             set { maximumPhysicalValue = value; }
+        }
+        public float DefaultMaximumPhysicalValue
+        {
+            get { return 0; }
         }
 
         private float maximumPhysicalValueLimit;
@@ -270,6 +364,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return maximumPhysicalValueLimit; }
             set { maximumPhysicalValueLimit = value; }
         }
+        public float DefaultMaximumPhysicalValueLimit
+        {
+            get { return 0; }
+        }
 
         private int maximumBitValue;
         /// <summary>
@@ -279,6 +377,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return maximumBitValue; }
             set { maximumBitValue = value; }
+        }
+        public int DefaultMaximumBitValue
+        {
+            get { return 0; }
         }
 
         private float minimumLogicalValue;
@@ -290,6 +392,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return minimumLogicalValue; }
             set { minimumLogicalValue = value; }
         }
+        public float DefaultMinimumLogicalValue
+        {
+            get { return 0; }
+        }
 
         private float minimumPhysicalValue;
         /// <summary>
@@ -299,6 +405,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return minimumPhysicalValue; }
             set { minimumPhysicalValue = value; }
+        }
+        public float DefaultMinimumPhysicalValue
+        {
+            get { return 0; }
         }
 
         private float minimumPhysicalValueLimit;
@@ -310,6 +420,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return minimumPhysicalValueLimit; }
             set { minimumPhysicalValueLimit = value; }
         }
+        public float DefaultMinimumPhysicalValueLimit
+        {
+            get { return 0; }
+        }
 
         private int minimumBitValue;
         /// <summary>
@@ -320,8 +434,30 @@ namespace SignalAutoConfigurationTool.EIO
             get { return minimumBitValue; }
             set { minimumBitValue = value; }
         }
+        public int DefaultMinimumBitValue
+        {
+            get { return 0; }
+        }
 
-        public SignalBase(string name, SignalType signalType, string signalIdentificationLabel, string deviceMapping, int numberOfBits, string category, string accessLevel, string safeLevel, Device assignedtoDevice)
+        private bool reservedDeviceMapping;
+
+        public bool ReservedDeviceMapping
+        {
+            get { return reservedDeviceMapping; }
+            set { reservedDeviceMapping = value; }
+        }
+
+        private bool alignmentByte;
+
+        public bool AlignmentByte
+        {
+            get { return alignmentByte; }
+            set { alignmentByte = value; }
+        }
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Signal(string name, SignalType signalType, string signalIdentificationLabel, string deviceMapping, int numberOfBits, string category, string accessLevel, string safeLevel, Device assignedtoDevice)
         {
             this.Name = name;
             this.SignalType = signalType;
@@ -339,9 +475,8 @@ namespace SignalAutoConfigurationTool.EIO
                 this.DeviceMapping = deviceMapping;
             }
         }
-
-
-        public SignalBase(Instance instanceSignal, Device assignedtoDevice) 
+        
+        public Signal(Instance instanceSignal, Device assignedtoDevice) 
         {
             this.Name = (string)instanceSignal.GetAttribute("Name");
             this.SignalType = (SignalType)Enum.Parse(typeof(SignalType),(string)instanceSignal.GetAttribute("SignalType"));
@@ -374,7 +509,8 @@ namespace SignalAutoConfigurationTool.EIO
             this.MinimumPhysicalValueLimit = (float)instanceSignal.GetAttribute("MinPhysLimit");
             this.MinimumBitValue = (int)instanceSignal.GetAttribute("MinBitVal");
         }
-        public int CompareTo(SignalBase other)
+
+        public int CompareTo(Signal other)
         {
             if(this.AssignedtoDevice.Name != other.AssignedtoDevice.Name)
             {

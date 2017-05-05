@@ -79,12 +79,14 @@
 
                 <DataGrid Name="dataGrid_signals" CanUserSortColumns="False" AutoGenerateColumns="False" CanUserAddRows="True"  Grid.Row="1" Grid.Column="0">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Path=Name}" ></DataGridTextColumn>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Path=Name}" ></DataGridTextColumn>
                         <DataGridTextColumn Header="Index"  Binding="{Binding Path=Index}"></DataGridTextColumn>
-                        <DataGridComboBoxColumn  Header="SignalType" IsReadOnly="True"  SelectedItemBinding="{Binding SignalType}" ItemsSource="{Binding Source={StaticResource SignalType}}" />
-                        <DataGridTextColumn Header="SignalIdentificationLabel"  Binding="{Binding Path=SignalIdentificationLabel}"></DataGridTextColumn>
-                        <DataGridTextColumn Header="DeviceMapping" Binding="{Binding Path=DeviceMapping}"></DataGridTextColumn>
+                        <DataGridCheckBoxColumn Header="Reserved"  Binding="{Binding Path=ReservedDeviceMapping}"></DataGridCheckBoxColumn>
+                        <DataGridCheckBoxColumn Header="Alignment"  Binding="{Binding Path=AlignmentByte}"></DataGridCheckBoxColumn>
+                        <DataGridComboBoxColumn  Header="SignalType" SelectedItemBinding="{Binding SignalType}" ItemsSource="{Binding Source={StaticResource SignalType}}" />
                         <DataGridTextColumn Header="NumberOfBits" Binding="{Binding Path=NumberOfBits}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="DeviceMapping" Binding="{Binding Path=DeviceMapping}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="SignalIdentificationLabel"  Binding="{Binding Path=SignalIdentificationLabel}"></DataGridTextColumn>
                         <DataGridTextColumn Header="Category"  Binding="{Binding Path=Category}"></DataGridTextColumn>
                         <DataGridTextColumn Header="AccessLevel"  IsReadOnly="True"   Binding="{Binding Path=AccessLevel}"></DataGridTextColumn>
                         <DataGridTextColumn Header="SafeLevel"  IsReadOnly="True"  Binding="{Binding Path=SafeLevel}"></DataGridTextColumn>
@@ -107,8 +109,8 @@
                         </DataGridComboBoxColumn>-->
                         <DataGridTextColumn Header="IndustrialNetwork"  IsReadOnly="True"  Binding="{Binding Path=AssignedtoDevice.ConnectedtoIndustrialNetwork.Name}" ></DataGridTextColumn>
                         <DataGridTextColumn Header="DefaultValue"   Binding="{Binding Path=DefaultValue}"></DataGridTextColumn>
-                        <DataGridTextColumn Header="FilterTimeActive"  IsReadOnly="True"   Binding="{Binding Path=FilterTimeActive}"></DataGridTextColumn>
-                        <DataGridTextColumn Header="FilterTimePassive"  IsReadOnly="True"   Binding="{Binding Path=FilterTimePassive}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="FilterTimeActive"  Binding="{Binding Path=FilterTimeActive}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="FilterTimePassive"   Binding="{Binding Path=FilterTimePassive}"></DataGridTextColumn>
                         <DataGridTextColumn Header="InvertPhysicalValue"    Binding="{Binding Path=InvertPhysicalValue}"></DataGridTextColumn>
                         <!--<DataGridTextColumn Header="AnalogEncodingType" Binding="{Binding Path=AnalogEncodingType}" ></DataGridTextColumn>-->
                         <DataGridComboBoxColumn Header="AnalogEncodingType2"  SelectedItemBinding="{Binding Path=AnalogEncodingType}" >
@@ -134,6 +136,7 @@
                             <MenuItem Name="menu_RefreshSignalIndex"  Header="RefreshSignalIndex" Click="menu_RefreshSignalIndex_Click" ></MenuItem>
                             <MenuItem Name="menu_ReArrangeSignalDeviceMappingbyIndex"  Header="ReArrangeDeviceMapping" Click="menu_ReArrangeSignalDeviceMappingbyIndex_Click" ></MenuItem>
                             <MenuItem Name="menu_SaveSignalstoCFG"  Header="SaveSignalstoCFG" Click="menu_SaveSignalstoCFG_Click"  ></MenuItem>
+                            <MenuItem Name="menu_ResetSignalTypeByName"  Header="ResetSignalTypeByName" Click="menu_ResetSignalTypeByName_Click"  ></MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

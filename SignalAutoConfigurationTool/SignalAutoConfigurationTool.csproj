@@ -70,6 +70,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataGridHelper.cs" />
     <Compile Include="EIO\Device.cs" />
     <Compile Include="EIO\DeviceNet.cs" />
     <Compile Include="EIO\DeviceNetDevice.cs" />
@@ -81,13 +82,7 @@
     <Compile Include="EIO\Profinet.cs" />
     <Compile Include="EIO\ProfinetDevice.cs" />
     <Compile Include="EIO\ProfinetInternalDevice.cs" />
-    <Compile Include="EIO\SignalAnalogInput.cs" />
-    <Compile Include="EIO\SignalAnalogOutput.cs" />
-    <Compile Include="EIO\SignalBase.cs" />
-    <Compile Include="EIO\SignalDigitalInput.cs" />
-    <Compile Include="EIO\SignalDigitalOutput.cs" />
-    <Compile Include="EIO\SignalGroupInput.cs" />
-    <Compile Include="EIO\SignalGroupOutput.cs" />
+    <Compile Include="EIO\Signal.cs" />
     <Compile Include="EIO\Virtual1.cs" />
     <Compile Include="EIO\Virtual1Device.cs" />
     <Compile Include="MainWindow.xaml.cs">

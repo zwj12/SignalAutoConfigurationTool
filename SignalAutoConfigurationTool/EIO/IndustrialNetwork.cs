@@ -51,13 +51,13 @@ namespace SignalAutoConfigurationTool.EIO
             throw new Exception("Please override this function");
         }
 
-        public Dictionary<string, SignalBase> GetSignals()
+        public Dictionary<string, Signal> GetSignals()
         {
             Dictionary<string, Device> devices = this.GetDevices();
-            Dictionary<string, SignalBase> signals = new Dictionary<string, SignalBase>();
+            Dictionary<string, Signal> signals = new Dictionary<string, Signal>();
             foreach (Device device in devices.Values)
             {
-                signals = signals.Concat(device.Signals.Select(x => new KeyValuePair<string, SignalBase>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+                signals = signals.Concat(device.Signals.Select(x => new KeyValuePair<string, Signal>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
             }
             return signals;
         }

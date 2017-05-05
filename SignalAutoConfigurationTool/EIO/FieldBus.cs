@@ -75,12 +75,12 @@ namespace SignalAutoConfigurationTool.EIO
             return devices;
         }
 
-        public Dictionary<string, SignalBase> GetSignals()
+        public Dictionary<string, Signal> GetSignals()
         {
-            Dictionary<string, SignalBase> signals = new Dictionary<string, SignalBase>();
+            Dictionary<string, Signal> signals = new Dictionary<string, Signal>();
             foreach (Device device in this.GetDevices().Values)
             {
-                signals = signals.Concat(device.Signals.Select(x => new KeyValuePair<string, SignalBase>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+                signals = signals.Concat(device.Signals.Select(x => new KeyValuePair<string, Signal>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
             }
             return signals;
         }
@@ -127,7 +127,7 @@ namespace SignalAutoConfigurationTool.EIO
                     {
                         device = devices["Virtual1"];
                     }
-                    SignalBase signalBase = new SignalBase(instanceSignal, device);
+                    Signal signalBase = new Signal(instanceSignal, device);
                     //switch ((string)instanceSignal.GetAttribute("SignalType"))
                     //{
                     //    case "DI":

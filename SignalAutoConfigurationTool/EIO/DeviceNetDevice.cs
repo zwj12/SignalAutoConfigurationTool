@@ -25,6 +25,10 @@ namespace SignalAutoConfigurationTool.EIO
                 address = value;
             }
         }
+        public int DefaultAddress
+        {
+            get { return 63; }
+        }
 
         private int vendorID;
         /// <summary>
@@ -40,6 +44,10 @@ namespace SignalAutoConfigurationTool.EIO
                 }
                 vendorID = value;
             }
+        }
+        public int DefaultVendorID
+        {
+            get { return 0; }
         }
 
         private int productCode;
@@ -58,6 +66,10 @@ namespace SignalAutoConfigurationTool.EIO
                 productCode = value;
             }
         }
+        public int DefaultProductCode
+        {
+            get { return 0; }
+        }
 
         private int deviceType;
         /// <summary>
@@ -74,6 +86,10 @@ namespace SignalAutoConfigurationTool.EIO
                 }
                 deviceType = value;
             }
+        }
+        public int DefaultDeviceType
+        {
+            get { return 0; }
         }
 
         private int productionInhibitTime;
@@ -92,6 +108,10 @@ namespace SignalAutoConfigurationTool.EIO
                 productionInhibitTime = value;
             }
         }
+        public int DefaultProductionInhibitTime
+        {
+            get { return 10; }
+        }
 
         private string connectionType;
         /// <summary>
@@ -101,6 +121,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return connectionType; }
             set { connectionType = value; }
+        }
+        public string DefaultConnectionType
+        {
+            get { return "POLLED"; }
         }
 
         private int pollRate;
@@ -119,6 +143,10 @@ namespace SignalAutoConfigurationTool.EIO
                 pollRate = value;
             }
         }
+        public int DefaultPollRate
+        {
+            get { return 1000; }
+        }
 
         private int connectionOutputSize;
         /// <summary>
@@ -135,6 +163,10 @@ namespace SignalAutoConfigurationTool.EIO
                 }
                 connectionOutputSize = value;
             }
+        }
+        public int DefaultConnectionOutputSize
+        {
+            get { return 0; }
         }
 
         private int connectionInputSize;
@@ -153,6 +185,10 @@ namespace SignalAutoConfigurationTool.EIO
                 connectionInputSize = value;
             }
         }
+        public int DefaultConnectionInputSize
+        {
+            get { return 0; }
+        }
 
         private bool quickConnect;
         /// <summary>
@@ -162,6 +198,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return quickConnect; }
             set { quickConnect = value; }
+        }
+        public bool DefaultQuickConnect
+        {
+            get { return false; }
         }
 
         private string trustLevel;
@@ -173,15 +213,23 @@ namespace SignalAutoConfigurationTool.EIO
             get { return trustLevel; }
             set { trustLevel = value; }
         }
+        public string DefaultTrustLevel
+        {
+            get { return "DefaultTrustLevel"; }
+        }
 
-        private string statewhenSystemStartup;
+        private string stateWhenSystemStartup;
         /// <summary>
         /// Cfgname:StateWhenStartup
         /// </summary>
-        public string StatewhenSystemStartup
+        public string StateWhenSystemStartup
         {
-            get { return statewhenSystemStartup; }
-            set { statewhenSystemStartup = value; }
+            get { return stateWhenSystemStartup; }
+            set { stateWhenSystemStartup = value; }
+        }
+        public string DefaultStateWhenSystemStartup
+        {
+            get { return "Activated"; }
         }
 
         private bool simulated;
@@ -193,6 +241,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return simulated; }
             set { simulated = value; }
         }
+        public bool DefaultSimulated
+        {
+            get { return false; }
+        }
 
         private int recoveryTime;
         /// <summary>
@@ -202,6 +254,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return recoveryTime; }
             set { recoveryTime = value; }
+        }
+        public int DefaultRecoveryTime
+        {
+            get { return 5000; }
         }
 
         public DeviceNetDevice(Instance instanceDeviceNetDevice, IndustrialNetwork connectedtoIndustrialNetwork) :base(instanceDeviceNetDevice,null, connectedtoIndustrialNetwork)
@@ -218,10 +274,112 @@ namespace SignalAutoConfigurationTool.EIO
             this.QuickConnect = (bool)instanceDeviceNetDevice.GetAttribute("QuickConnect");
             this.Simulated = (bool)instanceDeviceNetDevice.GetAttribute("Simulated");
             this.TrustLevel = (string)instanceDeviceNetDevice.GetAttribute("TrustLevel");
-            this.StatewhenSystemStartup = (string)instanceDeviceNetDevice.GetAttribute("StateWhenStartup");
+            this.StateWhenSystemStartup = (string)instanceDeviceNetDevice.GetAttribute("StateWhenStartup");
             this.RecoveryTime = (int)instanceDeviceNetDevice.GetAttribute("RecoveryTime");
+        }
 
+        public override string GetDeviceCFG()
+        {
+            List<string> strPreLines = new List<string>();
+            strPreLines.Add(string.Format("      -Name \"{0}\"", this.Name));
+            FillCfgLines(strPreLines, "TrustLevel", this.TrustLevel,this.DefaultTrustLevel);
+            FillCfgLines(strPreLines, "VendorName", this.VendorName, this.DefaultVendorName);
+            FillCfgLines(strPreLines, "ProductName", this.ProductName, this.DefaultProductName);
+            FillCfgLines(strPreLines, "Address", this.Address, this.DefaultAddress);
+            FillCfgLines(strPreLines, "VendorId", this.VendorID, this.DefaultVendorID);
+            FillCfgLines(strPreLines, "ProductCode", this.ProductCode, this.DefaultProductCode);
+            FillCfgLines(strPreLines, "DeviceType", this.DeviceType, this.DefaultDeviceType);
+            FillCfgLines(strPreLines, "PollRate", this.PollRate, this.DefaultPollRate);
+            FillCfgLines(strPreLines, "OutputSize", this.ConnectionOutputSize, this.DefaultConnectionOutputSize);
+            FillCfgLines(strPreLines, "InputSize", this.ConnectionInputSize, this.DefaultConnectionInputSize);
+            FillCfgLines(strPreLines, "Label", this.IdentificationLabel, this.DefaultIdentificationLabel);
+            FillCfgLines(strPreLines, "ConnectionType", this.ConnectionType, this.DefaultConnectionType);
+            FillCfgLines(strPreLines, "ProductionInhibitTime", this.ProductionInhibitTime, this.DefaultProductionInhibitTime);
+            FillCfgLines(strPreLines, "QuickConnect", this.QuickConnect, this.DefaultQuickConnect);
+            FillCfgLines(strPreLines, "RecoveryTime", this.RecoveryTime, this.DefaultRecoveryTime);
+            FillCfgLines(strPreLines, "Simulated", this.Simulated, this.DefaultSimulated);
+            FillCfgLines(strPreLines, "StateWhenStartup", this.StateWhenSystemStartup, this.DefaultStateWhenSystemStartup);
+            StringBuilder strBuilder = new StringBuilder();
+            foreach(string str in strPreLines)
+            {
+                strBuilder.Append(str);
+            }
+            return strBuilder.ToString();
+        }
 
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, int intParameterValue, int intDefaultParameterValue)
+        {
+            if (intParameterValue == intDefaultParameterValue)
+            {
+                return ;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0} {1}", strParameter, intParameterValue);
+            if (strPreLines[strPreLines.Count-1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1]= strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add (strIndentation + strParameter);
+            }
+        }
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, float floatParameterValue, float floatDefaultParameterValue)
+        {
+            if (floatParameterValue == floatDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0} {1}", strParameter, floatParameterValue);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
+            }
+        }
+
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, string strParameterValue, string strDefaultParameterValue)
+        {
+            if (strParameterValue == strDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0} \"{1}\"", strParameter, strParameterValue);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
+            }
+        }
+
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, bool boolParameterValue, bool boolDefaultParameterValue)
+        {
+            if (boolParameterValue == boolDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0}", strParameter);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
+            }
         }
     }
 }
