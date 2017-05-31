@@ -1,4 +1,5 @@
-﻿using ABB.Robotics.Controllers.ConfigurationDomain;
+﻿using ABB.Robotics.Controllers;
+using ABB.Robotics.Controllers.ConfigurationDomain;
 using ABB.Robotics.Controllers.IOSystemDomain;
 using CNAUSRobotics;
 using SignalAutoConfigurationTool.EIO;
@@ -50,7 +51,7 @@ namespace SignalAutoConfigurationTool
                 myClass_Controller.ConnectbyGuid(Properties.Settings.Default.SystemGuid);
                 myClass_Controller.Login(Properties.Settings.Default.UserName, Properties.Settings.Default.Password);
                 this.label_ConnectingStatus.Content = string.Format("Controller: {0}({1})", myClass_Controller.controller.Name, myClass_Controller.controller.IPAddress);
-                this.LoadSignalsFromControllerCFG();
+ //               this.LoadSignalsFromControllerCFG();
             }
             catch
             {
@@ -265,6 +266,46 @@ namespace SignalAutoConfigurationTool
             else
             {
                 MessageBox.Show("Please select a device!");
+            }
+        }
+
+        private void menu_InitAnalogEncoding_Click(object sender, RoutedEventArgs e)
+        {
+            this.tree_Devices.Focus();
+            EIO.Signal signal = this.dataGrid_signals.SelectedItem as EIO.Signal;
+            if (signal !=null)
+            {
+                signal.InitAnalogEncoding();
+            }
+       
+        }
+
+        private void menu_GetSignalValues_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.dataGrid_signals.ItemsSource == null)
+            {
+                return;
+            }
+            List<EIO.Signal> signals = null;
+            signals = (List<EIO.Signal>)this.dataGrid_signals.ItemsSource ;
+            foreach(EIO.Signal signal in signals)
+            {
+                signal.GetSignalValue();
+            }
+        }
+
+        private void MenuItem_Test_Click(object sender, RoutedEventArgs e)
+        {
+            
+            ABB.Robotics.Controllers.IOSystemDomain.Signal signal = this.myClass_Controller.controller.IOSystem.GetSignal("diTest");
+            if (signal != null)
+            {
+                MessageBox.Show(signal.Value.ToString());
+                if (signal.State.Simulated == true)
+                {
+                signal.Value = 1;
+                }
+                signal.Value = 1;
             }
         }
     }

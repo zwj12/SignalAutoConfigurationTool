@@ -21,6 +21,10 @@ namespace SignalAutoConfigurationTool.EIO
                 profinetStationName = value;
             }
         }
+        public string DefaultProfinetStationName
+        {
+            get { return ""; }
+        }
 
         private string fastDeviceStartup;
         /// <summary>
@@ -30,6 +34,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return fastDeviceStartup; }
             set { fastDeviceStartup = value; }
+        }
+        public string DefaultFastDeviceStartup
+        {
+            get { return "Deactivated"; }
         }
 
         private bool energySaving;
@@ -41,6 +49,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return energySaving; }
             set { energySaving = value; }
+        }
+        public bool DefaultEnergySaving
+        {
+            get { return true; }
         }
 
         private int connectionOutputSize;
@@ -59,6 +71,10 @@ namespace SignalAutoConfigurationTool.EIO
                 connectionOutputSize = value;
             }
         }
+        public int DefaultConnectionOutputSize
+        {
+            get { return 0; }
+        }
 
         private int connectionInputSize;
         /// <summary>
@@ -76,6 +92,10 @@ namespace SignalAutoConfigurationTool.EIO
                 connectionInputSize = value;
             }
         }
+        public int DefaultConnectionInputSize
+        {
+            get { return 0; }
+        }
 
         private string trustLevel;
         /// <summary>
@@ -86,15 +106,23 @@ namespace SignalAutoConfigurationTool.EIO
             get { return trustLevel; }
             set { trustLevel = value; }
         }
+        public string DefaultTrustLevel
+        {
+            get { return "DefaultTrustLevel"; }
+        }
 
-        private string statewhenSystemStartup;
+        private string stateWhenSystemStartup;
         /// <summary>
         /// Cfgname:StateWhenStartup
         /// </summary>
-        public string StatewhenSystemStartup
+        public string StateWhenSystemStartup
         {
-            get { return statewhenSystemStartup; }
-            set { statewhenSystemStartup = value; }
+            get { return stateWhenSystemStartup; }
+            set { stateWhenSystemStartup = value; }
+        }
+        public string DefaultStateWhenSystemStartup
+        {
+            get { return "Activated"; }
         }
 
         private bool simulated;
@@ -106,6 +134,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return simulated; }
             set { simulated = value; }
         }
+        public bool DefaultSimulated
+        {
+            get { return false; }
+        }
 
         private int recoveryTime;
         /// <summary>
@@ -115,6 +147,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return recoveryTime; }
             set { recoveryTime = value; }
+        }
+        public int DefaultRecoveryTime
+        {
+            get { return 5000; }
         }
 
         private string port1;
@@ -126,6 +162,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return port1; }
             set { port1 = value; }
         }
+        public string DefaultPort1
+        {
+            get { return "Deactivated"; }
+        }
 
         private string port2;
         /// <summary>
@@ -135,6 +175,10 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return port2; }
             set { port2 = value; }
+        }
+        public string DefaultPort2
+        {
+            get { return "Deactivated"; }
         }
 
         private string port3;
@@ -146,6 +190,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return port3; }
             set { port3 = value; }
         }
+        public string DefaultPort3
+        {
+            get { return "Deactivated"; }
+        }
 
         private string port4;
         /// <summary>
@@ -156,6 +204,10 @@ namespace SignalAutoConfigurationTool.EIO
             get { return port4; }
             set { port4 = value; }
         }
+        public string DefaultPort4
+        {
+            get { return "Deactivated"; }
+        }
 
         public ProfinetDevice(Instance instanceProfinetDevice, IndustrialNetwork connectedtoIndustrialNetwork) :base(instanceProfinetDevice,null, connectedtoIndustrialNetwork)
         {
@@ -164,7 +216,7 @@ namespace SignalAutoConfigurationTool.EIO
             this.FastDeviceStartup = (string)instanceProfinetDevice.GetAttribute("FastDeviceStartup");
             this.Simulated = (bool)instanceProfinetDevice.GetAttribute("Simulated");
             this.TrustLevel = (string)instanceProfinetDevice.GetAttribute("TrustLevel");
-            this.StatewhenSystemStartup = (string)instanceProfinetDevice.GetAttribute("StateWhenStartup");
+            this.StateWhenSystemStartup = (string)instanceProfinetDevice.GetAttribute("StateWhenStartup");
             this.RecoveryTime = (int)instanceProfinetDevice.GetAttribute("RecoveryTime");
             if (this.Simulated)
             {
@@ -178,6 +230,33 @@ namespace SignalAutoConfigurationTool.EIO
                 this.Port3 = (string)instanceProfinetDevice.GetAttribute("FastDeviceStartup_Port3");
                 this.Port4 = (string)instanceProfinetDevice.GetAttribute("FastDeviceStartup_Port4");
             }
+        }
+        public override string GetDeviceCFG()
+        {
+            List<string> strPreLines = new List<string>();
+            strPreLines.Add(string.Format("      -Name \"{0}\"", this.Name));
+            FillCfgLines(strPreLines, "Label", this.IdentificationLabel, this.DefaultIdentificationLabel);
+            FillCfgLines(strPreLines, "VendorName", this.VendorName, this.DefaultVendorName);
+            FillCfgLines(strPreLines, "ProductName", this.ProductName, this.DefaultProductName);
+            FillCfgLines(strPreLines, "TrustLevel", this.TrustLevel, this.DefaultTrustLevel);
+            FillCfgLines(strPreLines, "OutputSize", this.ConnectionOutputSize, this.DefaultConnectionOutputSize);
+            FillCfgLines(strPreLines, "InputSize", this.ConnectionInputSize, this.DefaultConnectionInputSize);
+            FillCfgLines(strPreLines, "RecoveryTime", this.RecoveryTime, this.DefaultRecoveryTime);
+            FillCfgLines(strPreLines, "Simulated", this.Simulated, this.DefaultSimulated);
+            FillCfgLines(strPreLines, "StateWhenStartup", this.StateWhenSystemStartup, this.DefaultStateWhenSystemStartup);
+//            FillCfgLines(strPreLines, "EnergySaving", this.EnergySaving, this.DefaultEnergySaving);
+            FillCfgLines(strPreLines, "FastDeviceStartup", this.FastDeviceStartup, this.DefaultFastDeviceStartup);
+            FillCfgLines(strPreLines, "StationName", this.ProfinetStationName, this.DefaultProfinetStationName);
+            FillCfgLines(strPreLines, "FastDeviceStartup_Port1", this.Port1, this.DefaultPort1);
+            FillCfgLines(strPreLines, "FastDeviceStartup_Port2", this.Port2, this.DefaultPort2);
+            FillCfgLines(strPreLines, "FastDeviceStartup_Port3", this.Port3, this.DefaultPort3);
+            FillCfgLines(strPreLines, "FastDeviceStartup_Port4", this.Port4, this.DefaultPort4);
+            StringBuilder strBuilder = new StringBuilder();
+            foreach (string str in strPreLines)
+            {
+                strBuilder.Append(str);
+            }
+            return strBuilder.ToString();
         }
     }
 }

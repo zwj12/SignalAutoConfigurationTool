@@ -9,18 +9,18 @@ namespace SignalAutoConfigurationTool.EIO
 {
     public class ProfinetInternalDevice:Device
     {
-        private int outputSize;
+        private int connectionOutputSize;
         /// <summary>
         /// Cfgname:OutputSize
         /// </summary>
-        public int OutputSize
+        public int ConnectionOutputSize
         {
-            get { return outputSize; }
+            get { return connectionOutputSize; }
             set
             {
                 if (value == 8 || value ==16 || value == 32 || value == 64 || value == 128 || value == 256)
                 {
-                    outputSize = value;
+                    connectionOutputSize = value;
                 }
                 else
                 {
@@ -28,19 +28,23 @@ namespace SignalAutoConfigurationTool.EIO
                 }
             }
         }
+        public int DefaultConnectionOutputSize
+        {
+            get { return 0; }
+        }
 
-        private int inputSize;
+        private int connectionInputSize;
         /// <summary>
         /// Cfgname:InputSize
         /// </summary>
-        public int InputSize
+        public int ConnectionInputSize
         {
-            get { return inputSize; }
+            get { return connectionInputSize; }
             set
             {
                 if (value == 8 || value == 16 || value == 32 || value == 64 || value == 128 || value == 256)
                 {
-                    inputSize = value;
+                    connectionInputSize = value;
                 }
                 else
                 {
@@ -48,11 +52,32 @@ namespace SignalAutoConfigurationTool.EIO
                 }
             }
         }
+        public int DefaultConnectionInputSize
+        {
+            get { return 0; }
+        }
 
         public ProfinetInternalDevice(Instance instanceProfinetDevice, IndustrialNetwork connectedtoIndustrialNetwork) :base(instanceProfinetDevice,null, connectedtoIndustrialNetwork)
         {
-            this.OutputSize = (int)instanceProfinetDevice.GetAttribute("OutputSize");
-            this.InputSize = (int)instanceProfinetDevice.GetAttribute("InputSize");
+            this.ConnectionOutputSize = (int)instanceProfinetDevice.GetAttribute("OutputSize");
+            this.ConnectionInputSize = (int)instanceProfinetDevice.GetAttribute("InputSize");
+        }
+
+        public override string GetDeviceCFG()
+        {
+            List<string> strPreLines = new List<string>();
+            strPreLines.Add(string.Format("      -Name \"{0}\"", this.Name));
+            FillCfgLines(strPreLines, "Label", this.IdentificationLabel, this.DefaultIdentificationLabel);
+            FillCfgLines(strPreLines, "VendorName", this.VendorName, this.DefaultVendorName);
+            FillCfgLines(strPreLines, "ProductName", this.ProductName, this.DefaultProductName);
+            FillCfgLines(strPreLines, "OutputSize", this.ConnectionOutputSize, this.DefaultConnectionOutputSize);
+            FillCfgLines(strPreLines, "InputSize", this.ConnectionInputSize, this.DefaultConnectionInputSize);
+            StringBuilder strBuilder = new StringBuilder();
+            foreach (string str in strPreLines)
+            {
+                strBuilder.Append(str);
+            }
+            return strBuilder.ToString();
         }
     }
 }

@@ -28,6 +28,7 @@
             <MenuItem Header="Controller" >
                 <MenuItem Name="MenuItem_Connect" Header="Connect" ToolTip="Connect to a real or virtual controller"   Click="MenuItem_Connect_Click"/>
                 <MenuItem Name="MenuItem_SystemGuid" Header="SystemGuid"  ToolTip="Set the default controller's system guid" Click="MenuItem_SystemGuid_Click" />
+                <MenuItem Name="MenuItem_Test" Header="Test" Click="MenuItem_Test_Click" />
             </MenuItem>
         </Menu>
         <Grid  Grid.Row="1">
@@ -129,6 +130,8 @@
                         <DataGridTextColumn Header="MinimumPhysicalValue"  Binding="{Binding Path=MinimumPhysicalValue}"></DataGridTextColumn>
                         <DataGridTextColumn Header="MinimumPhysicalValueLimit"  Binding="{Binding Path=MinimumPhysicalValueLimit}"></DataGridTextColumn>
                         <DataGridTextColumn Header="MinimumBitValue"  Binding="{Binding Path=MinimumBitValue}"></DataGridTextColumn>
+                        <DataGridCheckBoxColumn Header="LittleEndian"  Binding="{Binding Path=LittleEndian}"></DataGridCheckBoxColumn>
+                        <DataGridTextColumn Header="SignalValue" IsReadOnly="True"  Binding="{Binding Path=SignalValue}"></DataGridTextColumn>
                       </DataGrid.Columns>
                     <DataGrid.ContextMenu>
                         <ContextMenu>
@@ -137,6 +140,8 @@
                             <MenuItem Name="menu_ReArrangeSignalDeviceMappingbyIndex"  Header="ReArrangeDeviceMapping" Click="menu_ReArrangeSignalDeviceMappingbyIndex_Click" ></MenuItem>
                             <MenuItem Name="menu_SaveSignalstoCFG"  Header="SaveSignalstoCFG" Click="menu_SaveSignalstoCFG_Click"  ></MenuItem>
                             <MenuItem Name="menu_ResetSignalTypeByName"  Header="ResetSignalTypeByName" Click="menu_ResetSignalTypeByName_Click"  ></MenuItem>
+                            <MenuItem Name="menu_InitAnalogEncoding"  Header="InitAnalogEncoding" Click="menu_InitAnalogEncoding_Click"   ></MenuItem>
+                            <MenuItem Name="menu_GetSignalValues"  Header="GetSignalValues" Click="menu_GetSignalValues_Click"   ></MenuItem>
                         </ContextMenu>
                     </DataGrid.ContextMenu>
                 </DataGrid>

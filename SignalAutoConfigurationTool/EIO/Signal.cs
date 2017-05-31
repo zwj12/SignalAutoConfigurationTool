@@ -454,7 +454,23 @@ namespace SignalAutoConfigurationTool.EIO
             get { return alignmentByte; }
             set { alignmentByte = value; }
         }
-        
+
+        private double signalValue;
+
+        public double SignalValue
+        {
+            get { return signalValue; }
+            set { signalValue = value; }
+        }
+
+        private bool littleEndian = false;
+
+        public bool LittleEndian
+        {
+            get { return littleEndian; }
+            set { littleEndian = value; }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Signal(string name, SignalType signalType, string signalIdentificationLabel, string deviceMapping, int numberOfBits, string category, string accessLevel, string safeLevel, Device assignedtoDevice)
@@ -561,6 +577,60 @@ namespace SignalAutoConfigurationTool.EIO
             }
             deviceMappings.Sort();
             return deviceMappings;
+        }
+
+        public void InitAnalogEncoding()
+        {
+            if (this.SignalType == SignalType.AI || this.SignalType == SignalType.AO) 
+            {
+                if (this.analogEncodingType == "TWO_COMP")
+                {
+                    this.minimumLogicalValue = 0;
+                    this.minimumPhysicalValue = 0;
+                    this.minimumPhysicalValueLimit = 0;
+                    this.minimumBitValue = -32768;
+
+                    this.maximumLogicalValue = 10;
+                    this.maximumPhysicalValue = 10;
+                    this.maximumPhysicalValueLimit = 10;
+                    this.maximumBitValue = 32767;
+                }
+                else
+                {
+                    this.minimumLogicalValue = 0;
+                    this.minimumPhysicalValue = 0;
+                    this.minimumPhysicalValueLimit = 0;
+                    this.minimumBitValue = 0;
+
+                    this.maximumLogicalValue = 10;
+                    this.maximumPhysicalValue = 10;
+                    this.maximumPhysicalValueLimit = 10;
+                    this.maximumBitValue = 65535;
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("MinimumLogicalValue"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MinimumPhysicalValue"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MinimumPhysicalValueLimit"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MinimumBitValue"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MaximumLogicalValue"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MaximumPhysicalValue"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MaximumPhysicalValueLimit"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("MaximumBitValue"));
+                }
+
+            }
+        }
+
+        public bool GetSignalValue()
+        {
+            ABB.Robotics.Controllers.IOSystemDomain.Signal signal = this.AssignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.Controller.IOSystem.GetSignal(this.Name);
+            if (signal != null)
+            {
+                this.SignalValue=signal.Value;
+                return true;
+            }
+            return false;
         }
     }
 

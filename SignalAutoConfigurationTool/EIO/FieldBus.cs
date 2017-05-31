@@ -16,6 +16,14 @@ namespace SignalAutoConfigurationTool.EIO
     /// </summary>
     public class FieldBus
     {
+        private Controller controller;
+
+        public Controller Controller
+        {
+            get { return controller; }
+            set { controller = value; }
+        }
+
         private Profinet profinet;
 
         public Profinet Profinet
@@ -54,9 +62,18 @@ namespace SignalAutoConfigurationTool.EIO
         public Dictionary<string, IndustrialNetwork> GetIndustrialNetworks()
         {
             Dictionary<string, IndustrialNetwork> industrialNetworks = new Dictionary<string, IndustrialNetwork>();
-            industrialNetworks.Add(this.DeviceNet.Name, this.DeviceNet);
-            industrialNetworks.Add(this.Profinet.Name, this.Profinet);
-            industrialNetworks.Add(this.EtherNetIP.Name, this.EtherNetIP);
+            if (this.DeviceNet != null)
+            {
+                industrialNetworks.Add(this.DeviceNet.Name, this.DeviceNet);
+            }
+            if (this.Profinet != null)
+            {
+                industrialNetworks.Add(this.Profinet.Name, this.Profinet);
+            }
+            if (this.EtherNetIP != null)
+            {
+                industrialNetworks.Add(this.EtherNetIP.Name, this.EtherNetIP);
+            }
             industrialNetworks.Add(this.Local.Name, this.Local);
             industrialNetworks.Add(this.Virtual.Name, this.Virtual);
             return industrialNetworks;
@@ -67,9 +84,18 @@ namespace SignalAutoConfigurationTool.EIO
         public Dictionary<string, Device> GetDevices()
         {
             Dictionary<string, Device> devices = new Dictionary<string, Device>();
-            devices = devices.Concat(this.DeviceNet.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
-            devices = devices.Concat(this.Profinet.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
-            devices = devices.Concat(this.EtherNetIP.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            if (this.DeviceNet != null)
+            {
+                devices = devices.Concat(this.DeviceNet.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            }
+            if (this.Profinet != null)
+            {
+                devices = devices.Concat(this.Profinet.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            }
+            if (this.EtherNetIP != null)
+            {
+                devices = devices.Concat(this.EtherNetIP.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            }
             devices = devices.Concat(this.Local.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
             devices = devices.Concat(this.Virtual.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
             return devices;
@@ -91,6 +117,7 @@ namespace SignalAutoConfigurationTool.EIO
         /// <param name="controller"></param>
         public FieldBus(Controller controller)
         {
+            this.Controller = controller;
             try
             {
                 foreach (Instance instanceIndustrialNetwork in controller.Configuration.Domains["EIO"]["INDUSTRIAL_NETWORK"].GetInstances())

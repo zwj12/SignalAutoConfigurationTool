@@ -151,6 +151,7 @@ namespace SignalAutoConfigurationTool.EIO
                 }
             }
         }
+
         public void ResetSignalTypeByName()
         {
             foreach (Signal signalbase in signals.Values)
@@ -224,8 +225,38 @@ namespace SignalAutoConfigurationTool.EIO
                                 iDeviceMappingNextBit += 8 - iDeviceMappingNextBit % 8;
                             }
                         }
-                        signalbase.DeviceMapping =string.Format("{0}-{1}", iDeviceMappingNextBit, iDeviceMappingNextBit+ signalbase.NumberOfBits-1);
-                        iDeviceMappingNextBit+= signalbase.NumberOfBits;
+                        if (signalbase.LittleEndian)
+                        {
+                            string strDeviceMapping = "";
+                            int iLittleEndian = iDeviceMappingNextBit + signalbase.NumberOfBits - 1;
+                            while (true)
+                            {
+                                int iLittleEndianBase = iLittleEndian - iLittleEndian % 8;
+                                if(iLittleEndian< iDeviceMappingNextBit)
+                                {
+                                    break;
+                                }
+                                if (!string.IsNullOrWhiteSpace(strDeviceMapping))
+                                {
+                                    strDeviceMapping += ",";
+                                }
+                                if (iLittleEndianBase == iLittleEndian)
+                                {
+                                    strDeviceMapping += string.Format("{0}", iLittleEndian);
+                                }
+                                else
+                                {
+                                    strDeviceMapping += string.Format("{0}-{1}", iLittleEndianBase>= iDeviceMappingNextBit? iLittleEndianBase: iDeviceMappingNextBit, iLittleEndian);
+                                }
+                                iLittleEndian = iLittleEndianBase - 1;
+                            }
+                            signalbase.DeviceMapping = strDeviceMapping;
+                        }
+                        else
+                        {
+                            signalbase.DeviceMapping = string.Format("{0}-{1}", iDeviceMappingNextBit, iDeviceMappingNextBit + signalbase.NumberOfBits - 1);
+                        }
+                        iDeviceMappingNextBit += signalbase.NumberOfBits;
                         break;
                     case SignalType.AI:
                         if (signalbase.AlignmentByte)
@@ -250,7 +281,37 @@ namespace SignalAutoConfigurationTool.EIO
                                 oDeviceMappingNextBit += 8 - oDeviceMappingNextBit % 8;
                             }
                         }
-                        signalbase.DeviceMapping = string.Format("{0}-{1}", oDeviceMappingNextBit, oDeviceMappingNextBit + signalbase.NumberOfBits - 1);
+                        if (signalbase.LittleEndian)
+                        {
+                            string strDeviceMapping = "";
+                            int oLittleEndian = oDeviceMappingNextBit + signalbase.NumberOfBits - 1;
+                            while (true)
+                            {
+                                int oLittleEndianBase = oLittleEndian - oLittleEndian % 8;
+                                if (oLittleEndian < oDeviceMappingNextBit)
+                                {
+                                    break;
+                                }
+                                if (!string.IsNullOrWhiteSpace(strDeviceMapping))
+                                {
+                                    strDeviceMapping += ",";
+                                }
+                                if (oLittleEndianBase == oLittleEndian)
+                                {
+                                    strDeviceMapping += string.Format("{0}", oLittleEndian);
+                                }
+                                else
+                                {
+                                    strDeviceMapping += string.Format("{0}-{1}", oLittleEndianBase >= oDeviceMappingNextBit ? oLittleEndianBase : oDeviceMappingNextBit, oLittleEndian);
+                                }
+                                oLittleEndian = oLittleEndianBase - 1;
+                            }
+                            signalbase.DeviceMapping = strDeviceMapping;
+                        }
+                        else
+                        {
+                            signalbase.DeviceMapping = string.Format("{0}-{1}", oDeviceMappingNextBit, oDeviceMappingNextBit + signalbase.NumberOfBits - 1);
+                        }
                         oDeviceMappingNextBit  += signalbase.NumberOfBits;
                         break;
                     case SignalType.AO:
@@ -287,12 +348,26 @@ namespace SignalAutoConfigurationTool.EIO
             FileStream fs = new FileStream(mySaveFileDialog.FileName, FileMode.Create);
             StreamWriter myStreamWriter = new StreamWriter(fs);
             myStreamWriter.Write("EIO:CFG_1.0::\n");
+
             if(this is DeviceNetDevice)
             {
                 myStreamWriter.Write("#\nDEVICENET_DEVICE:\n");
-                myStreamWriter.WriteLine("");
-                myStreamWriter.WriteLine(this.GetDeviceCFG());
             }
+            else if(this is DeviceNetInternalDevice)
+            {
+                myStreamWriter.Write("#\nDEVICENET_INTERNAL_DEVICE:\n");
+            }
+            else if (this is ProfinetDevice)
+            {
+                myStreamWriter.Write("#\nPROFINET_DEVICE:\n");
+            }
+            else if (this is ProfinetInternalDevice)
+            {
+                myStreamWriter.Write("#\nPROFINET_INTERNAL_DEVICE:\n");
+            }
+            myStreamWriter.WriteLine("");
+            myStreamWriter.WriteLine(this.GetDeviceCFG());
+
             myStreamWriter.Write("#\nEIO_SIGNAL:\n");
 
             List<Signal> signals = this.signals.Values.ToList();
@@ -430,6 +505,81 @@ namespace SignalAutoConfigurationTool.EIO
             {
                 myStreamWriter.WriteLine(strSignalLine + "\\");
                 return strIndentation + strSignalParameter;
+            }
+        }
+
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, int intParameterValue, int intDefaultParameterValue)
+        {
+            if (intParameterValue == intDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0} {1}", strParameter, intParameterValue);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
+            }
+        }
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, float floatParameterValue, float floatDefaultParameterValue)
+        {
+            if (floatParameterValue == floatDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0} {1}", strParameter, floatParameterValue);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
+            }
+        }
+
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, string strParameterValue, string strDefaultParameterValue)
+        {
+            if (strParameterValue == strDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0} \"{1}\"", strParameter, strParameterValue);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
+            }
+        }
+
+        static public void FillCfgLines(List<string> strPreLines, string strParameter, bool boolParameterValue, bool boolDefaultParameterValue)
+        {
+            if (boolParameterValue == boolDefaultParameterValue)
+            {
+                return;
+            }
+            string strIndentation = "     ";
+            strParameter = string.Format(" -{0}", strParameter);
+            if (strPreLines[strPreLines.Count - 1].Length + strParameter.Length < 80)
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + strParameter;
+            }
+            else
+            {
+                strPreLines[strPreLines.Count - 1] = strPreLines[strPreLines.Count - 1] + "\\\n";
+                strPreLines.Add(strIndentation + strParameter);
             }
         }
     }
