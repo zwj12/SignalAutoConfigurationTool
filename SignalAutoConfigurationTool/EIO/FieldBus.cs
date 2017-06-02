@@ -59,6 +59,14 @@ namespace SignalAutoConfigurationTool.EIO
             get { return local; }
         }
 
+        private Dictionary<string, AccessLevel> accessLevels;
+
+        public Dictionary<string, AccessLevel> AccessLevels
+        {
+            get { return accessLevels; }
+            set { accessLevels = value; }
+        }      
+
         public Dictionary<string, IndustrialNetwork> GetIndustrialNetworks()
         {
             Dictionary<string, IndustrialNetwork> industrialNetworks = new Dictionary<string, IndustrialNetwork>();
@@ -120,6 +128,13 @@ namespace SignalAutoConfigurationTool.EIO
             this.Controller = controller;
             try
             {
+                this.accessLevels = new Dictionary<string, EIO.AccessLevel>();
+                foreach (Instance instanceAccessLevel in controller.Configuration.Domains["EIO"]["EIO_ACCESS"].GetInstances())
+                {
+                    AccessLevel accessLevel = new EIO.AccessLevel(instanceAccessLevel, this);
+                    this.accessLevels.Add(accessLevel.Name, accessLevel);
+                }
+
                 foreach (Instance instanceIndustrialNetwork in controller.Configuration.Domains["EIO"]["INDUSTRIAL_NETWORK"].GetInstances())
                 {
                     switch (instanceIndustrialNetwork.Name)

@@ -163,6 +163,14 @@ namespace SignalAutoConfigurationTool
             dataGridComboBoxColumnDevice.DisplayIndex = 7;
             this.dataGrid_signals.Columns.Add(dataGridComboBoxColumnDevice);
 
+            DataGridComboBoxColumn dataGridComboBoxColumnAccessLevel = new DataGridComboBoxColumn();
+            dataGridComboBoxColumnAccessLevel.Header = "AccessLevel";
+            dataGridComboBoxColumnAccessLevel.SelectedItemBinding = new Binding("AccessLevel");
+            dataGridComboBoxColumnAccessLevel.DisplayMemberPath = "Name";
+            dataGridComboBoxColumnAccessLevel.ItemsSource = fieldBus.AccessLevels.Values.ToList();
+            dataGridComboBoxColumnAccessLevel.DisplayIndex = 10;
+            this.dataGrid_signals.Columns.Add(dataGridComboBoxColumnAccessLevel);
+            
         }
 
         private void tree_Devices_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

@@ -71,6 +71,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DataGridHelper.cs" />
+    <Compile Include="EIO\AccessLevel.cs" />
     <Compile Include="EIO\Device.cs" />
     <Compile Include="EIO\DeviceNet.cs" />
     <Compile Include="EIO\DeviceNetDevice.cs" />

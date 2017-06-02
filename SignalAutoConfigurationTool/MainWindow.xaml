@@ -89,7 +89,7 @@
                         <DataGridTextColumn Header="DeviceMapping" Binding="{Binding Path=DeviceMapping}"></DataGridTextColumn>
                         <DataGridTextColumn Header="SignalIdentificationLabel"  Binding="{Binding Path=SignalIdentificationLabel}"></DataGridTextColumn>
                         <DataGridTextColumn Header="Category"  Binding="{Binding Path=Category}"></DataGridTextColumn>
-                        <DataGridTextColumn Header="AccessLevel"  IsReadOnly="True"   Binding="{Binding Path=AccessLevel}"></DataGridTextColumn>
+                        <!--<DataGridTextColumn Header="AccessLevel"  IsReadOnly="True"   Binding="{Binding Path=AccessLevel}"></DataGridTextColumn>-->
                         <DataGridTextColumn Header="SafeLevel"  IsReadOnly="True"  Binding="{Binding Path=SafeLevel}"></DataGridTextColumn>
                         <!--<DataGridTextColumn Header="Device" Binding="{Binding Path=AssignedtoDevice.Name}" ></DataGridTextColumn>-->
                         <!--<DataGridComboBoxColumn  Header="Device">

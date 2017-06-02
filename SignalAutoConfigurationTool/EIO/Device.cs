@@ -384,7 +384,7 @@ namespace SignalAutoConfigurationTool.EIO
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "DeviceMap", signalbase.DeviceMapping, signalbase.DefaultDeviceMapping);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Category", signalbase.Category, signalbase.DefaultCategory);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Label", signalbase.SignalIdentificationLabel, signalbase.DefaultSignalIdentificationLabel);
-                strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Access", signalbase.AccessLevel, signalbase.DefaultAccessLevel);
+                strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Access", signalbase.AccessLevel.Name, signalbase.DefaultAccessLevel);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "SafeLevel", signalbase.SafeLevel, signalbase.DefaultSafeLevel);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Default", signalbase.DefaultValue, signalbase.DefaultDefaultValue);
                 switch (signalbase.SignalType)

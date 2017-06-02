@@ -215,11 +215,11 @@ namespace SignalAutoConfigurationTool.EIO
             get { return ""; }
         }
 
-        private string accessLevel;
+        private AccessLevel accessLevel;
         /// <summary>
         /// Cfgname:Access
         /// </summary>
-        public string AccessLevel
+        public AccessLevel AccessLevel
         {
             get { return accessLevel; }
             set { accessLevel = value; }
@@ -473,7 +473,7 @@ namespace SignalAutoConfigurationTool.EIO
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Signal(string name, SignalType signalType, string signalIdentificationLabel, string deviceMapping, int numberOfBits, string category, string accessLevel, string safeLevel, Device assignedtoDevice)
+        public Signal(string name, SignalType signalType, string signalIdentificationLabel, string deviceMapping, int numberOfBits, string category, AccessLevel accessLevel, string safeLevel, Device assignedtoDevice)
         {
             this.Name = name;
             this.SignalType = signalType;
@@ -498,7 +498,7 @@ namespace SignalAutoConfigurationTool.EIO
             this.SignalType = (SignalType)Enum.Parse(typeof(SignalType),(string)instanceSignal.GetAttribute("SignalType"));
             this.SignalIdentificationLabel = (string)instanceSignal.GetAttribute("Label");
             this.Category = (string)instanceSignal.GetAttribute("Category");
-            this.AccessLevel = (string)instanceSignal.GetAttribute("Access");
+            this.AccessLevel = assignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.AccessLevels[(string)instanceSignal.GetAttribute("Access")];
             this.SafeLevel = (string)instanceSignal.GetAttribute("SafeLevel");
             this.AssignedtoDevice = assignedtoDevice;
             string strDeviceMapping = (string)instanceSignal.GetAttribute("DeviceMap");
