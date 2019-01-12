@@ -168,7 +168,32 @@ namespace SignalAutoConfigurationTool.EIO
         }
         public int DefaultNumberOfBits
         {
-            get { return 23; }
+            get
+            {
+                if (this.SignalType == SignalType.DI || this.SignalType == SignalType.DO)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 23;
+                }
+                //if (this.assignedtoDevice.Name == "Virtual1")
+                //{
+                //    return 23;
+                //}
+                //else
+                //{
+                //    if (this.SignalType == SignalType.DI || this.SignalType == SignalType.DO)
+                //    {
+                //        return 1;
+                //    }
+                //    else
+                //    {
+                //        return 16;
+                //    }
+                //}
+            }
         }
 
         private int index;
@@ -471,6 +496,22 @@ namespace SignalAutoConfigurationTool.EIO
             set { littleEndian = value; }
         }
 
+        private bool inputAsPhysical;
+
+        public bool InputAsPhysical
+        {
+            get { return inputAsPhysical; }
+            set { inputAsPhysical = value; }
+        }
+
+        private bool simulated;
+
+        public bool Simulated
+        {
+            get { return simulated; }
+            set { simulated = value; }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Signal(string name, SignalType signalType, string signalIdentificationLabel, string deviceMapping, int numberOfBits, string category, AccessLevel accessLevel, string safeLevel, Device assignedtoDevice)
@@ -498,7 +539,21 @@ namespace SignalAutoConfigurationTool.EIO
             this.SignalType = (SignalType)Enum.Parse(typeof(SignalType),(string)instanceSignal.GetAttribute("SignalType"));
             this.SignalIdentificationLabel = (string)instanceSignal.GetAttribute("Label");
             this.Category = (string)instanceSignal.GetAttribute("Category");
-            this.AccessLevel = assignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.AccessLevels[(string)instanceSignal.GetAttribute("Access")];
+            if (assignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.AccessLevels.ContainsKey((string)instanceSignal.GetAttribute("Access")))
+            {
+                this.AccessLevel = assignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.AccessLevels[(string)instanceSignal.GetAttribute("Access")];
+            }
+            else
+            {
+                foreach(AccessLevel accessLevel in assignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.AccessLevels.Values)
+                {
+                    if(accessLevel.Name.ToLower()== ((string)instanceSignal.GetAttribute("Access")).ToLower())
+                    {
+                        this.AccessLevel = accessLevel;
+                        break;
+                    }
+                }
+            }
             this.SafeLevel = (string)instanceSignal.GetAttribute("SafeLevel");
             this.AssignedtoDevice = assignedtoDevice;
             string strDeviceMapping = (string)instanceSignal.GetAttribute("DeviceMap");
@@ -628,6 +683,8 @@ namespace SignalAutoConfigurationTool.EIO
             if (signal != null)
             {
                 this.SignalValue=signal.Value;
+                this.InputAsPhysical=signal.InputAsPhysical;
+                this.Simulated = signal.State.Simulated;
                 return true;
             }
             return false;

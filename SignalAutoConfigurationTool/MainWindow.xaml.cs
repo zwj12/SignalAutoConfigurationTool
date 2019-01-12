@@ -19,6 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.IO;
 
 namespace SignalAutoConfigurationTool
 { 
@@ -214,7 +216,7 @@ namespace SignalAutoConfigurationTool
 
         private void menu_FrozenColumn_Click(object sender, RoutedEventArgs e)
         {
-            if (this.dataGrid_signals.CurrentCell != null)
+            if (this.dataGrid_signals.CurrentItem != null)
             {
                 this.dataGrid_signals.FrozenColumnCount = this.dataGrid_signals.CurrentCell.Column.DisplayIndex;
             }
@@ -315,6 +317,100 @@ namespace SignalAutoConfigurationTool
                 }
                 signal.Value = 1;
             }
+        }
+
+        private void menu_ExportToExcel_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.dataGrid_signals.ItemsSource == null)
+            {
+                return;
+            }
+            List<EIO.Signal> signals = null;
+            signals = (List<EIO.Signal>)this.dataGrid_signals.ItemsSource;
+
+            SaveFileDialog mySaveFileDialog = new SaveFileDialog();
+            mySaveFileDialog.FileName = this.myClass_Controller.controller.Name + ".csv";
+            mySaveFileDialog.Filter = "CSV files (*.csv)|*.csv";
+            mySaveFileDialog.RestoreDirectory = true;
+            Nullable<bool> result = mySaveFileDialog.ShowDialog();
+            if (result == false)
+            {
+                return;
+            }
+            FileStream fs = new FileStream(mySaveFileDialog.FileName, FileMode.Create);
+            StreamWriter myStreamWriter = new StreamWriter(fs);
+            string strTab= ",";
+            myStreamWriter.Write("Name,SignalType,AssignedtoDevice,DeviceMapping,Category,SignalIdentificationLabel,AccessLevel,SafeLevel,DefaultValue,NumberOfBits,FilterTimePassive,FilterTimeActive,InvertPhysicalValue,AnalogEncodingType, MaximumLogicalValue, MaximumPhysicalValue, MaximumPhysicalValueLimit, MaximumBitValue, MinimumLogicalValue, MinimumPhysicalValue, MinimumPhysicalValueLimit, MinimumBitValue\n");
+
+            foreach (EIO.Signal signal in signals)
+            {
+                myStreamWriter.Write(signal.Name);
+                myStreamWriter.Write(strTab + signal.SignalType.ToString());
+                myStreamWriter.Write(strTab + signal.AssignedtoDevice.Name);
+                myStreamWriter.Write(strTab + signal.DeviceMapping);
+                myStreamWriter.Write(strTab + signal.Category);
+                myStreamWriter.Write(strTab + signal.SignalIdentificationLabel);
+                myStreamWriter.Write(strTab + signal.AccessLevel.Name);
+                myStreamWriter.Write(strTab + signal.SafeLevel);
+                myStreamWriter.Write(strTab + signal.DefaultValue);
+                myStreamWriter.Write(strTab + signal.NumberOfBits);
+
+                switch (signal.SignalType)
+                {
+                    case EIO.SignalType.DI:
+                    case EIO.SignalType.DO:
+                    case EIO.SignalType.GI:
+                    case EIO.SignalType.GO:
+                        myStreamWriter.Write(strTab + signal.FilterTimePassive);
+                        myStreamWriter.Write(strTab + signal.FilterTimeActive);
+                        myStreamWriter.Write(strTab + signal.InvertPhysicalValue);
+
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        break;
+                    case EIO.SignalType.AI:
+                    case EIO.SignalType.AO:
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + "");
+                        myStreamWriter.Write(strTab + signal.AnalogEncodingType);
+                        myStreamWriter.Write(strTab + signal.MaximumLogicalValue);
+                        myStreamWriter.Write(strTab + signal.MaximumPhysicalValue);
+                        myStreamWriter.Write(strTab + signal.MaximumPhysicalValueLimit);
+                        myStreamWriter.Write(strTab + signal.MaximumBitValue);
+                        myStreamWriter.Write(strTab + signal.MinimumLogicalValue);
+                        myStreamWriter.Write(strTab + signal.MinimumPhysicalValue);
+                        myStreamWriter.Write(strTab + signal.MinimumPhysicalValueLimit);
+                        myStreamWriter.Write(strTab + signal.MinimumBitValue);
+                        break;
+                }
+                myStreamWriter.Write("\n");
+            }
+
+            myStreamWriter.Close();
+            fs.Close();
+        }
+
+        private void menu_QueryFilter_Click(object sender, RoutedEventArgs e)
+        {
+            //this.tree_Devices.Focus();
+            //object obj = this.dataGrid_signals.Tag;
+            //if (obj is Device)
+            //{
+            //    QueryFilterWindow queryFilterWindow = new QueryFilterWindow();
+            //    queryFilterWindow.ShowDialog();
+            //}
+            //else
+            //{
+            //    MessageBox.Show("Please select a device!");
+            //}
         }
     }
 }

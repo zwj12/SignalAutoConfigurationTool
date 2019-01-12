@@ -76,6 +76,21 @@ namespace SignalAutoConfigurationTool.EIO
             get { return ""; }
         }
 
+        private bool simulated;
+        /// <summary>
+        /// Cfgname:Simulated
+        /// </summary>
+        public bool Simulated
+        {
+            get { return simulated; }
+            set { simulated = value; }
+        }
+        public bool DefaultSimulated
+        {
+            get { return false; }
+        }
+
+
         private Dictionary<string, Signal> signals = new Dictionary<string, EIO.Signal>();
 
         public Dictionary<string, Signal> Signals
@@ -101,6 +116,7 @@ namespace SignalAutoConfigurationTool.EIO
                 this.IdentificationLabel = (string)instanceDevice.GetAttribute("Label");
                 this.VendorName = (string)instanceDevice.GetAttribute("VendorName");
                 this.ProductName = (string)instanceDevice.GetAttribute("ProductName");
+                this.Simulated = (bool)instanceDevice.GetAttribute("Simulated");
             }
             else
             {
@@ -387,6 +403,10 @@ namespace SignalAutoConfigurationTool.EIO
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Access", signalbase.AccessLevel.Name, signalbase.DefaultAccessLevel);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "SafeLevel", signalbase.SafeLevel, signalbase.DefaultSafeLevel);
                 strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Default", signalbase.DefaultValue, signalbase.DefaultDefaultValue);
+                if(signalbase.AssignedtoDevice.name== "Virtual1" || signalbase.AssignedtoDevice.Simulated)
+                {
+                    strSignalLine = WriteCfgLine(myStreamWriter, strSignalLine, "Size", signalbase.NumberOfBits, signalbase.DefaultNumberOfBits);
+                }
                 switch (signalbase.SignalType)
                 {
                     case SignalType.DI:
