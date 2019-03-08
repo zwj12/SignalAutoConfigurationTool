@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
+using System.Windows;
 
 namespace SignalAutoConfigurationTool.EIO
 {
@@ -16,6 +18,8 @@ namespace SignalAutoConfigurationTool.EIO
     /// </summary>
     public class FieldBus
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(FieldBus));
+
         private Controller controller;
 
         public Controller Controller
@@ -159,7 +163,7 @@ namespace SignalAutoConfigurationTool.EIO
                 Dictionary<string, Device> devices = new Dictionary<string, Device>();
                 devices = this.GetDevices();
                 foreach (Instance instanceSignal in controller.Configuration.Domains["EIO"]["EIO_SIGNAL"].GetInstances())
-                {
+                {                    
                     Device device = null;
                     if (devices.ContainsKey((string)instanceSignal.GetAttribute("Device")))
                     {
@@ -169,7 +173,8 @@ namespace SignalAutoConfigurationTool.EIO
                     {
                         device = devices["Virtual1"];
                     }
-                    Signal signalBase = new Signal(instanceSignal, device);
+                    Signal signalBase = new Signal(instanceSignal, device);                    
+                    //log.Debug(signalBase.Name);
                     //switch ((string)instanceSignal.GetAttribute("SignalType"))
                     //{
                     //    case "DI":

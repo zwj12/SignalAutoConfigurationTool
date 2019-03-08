@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SignalAutoConfigurationTool.EIO
 {
@@ -24,10 +25,7 @@ namespace SignalAutoConfigurationTool.EIO
                 if (Regex.IsMatch(value, strRegexIdentifier))
                 {
                     name = value;
-                    if (PropertyChanged != null)
-                    {
-                        PropertyChanged(this, new PropertyChangedEventArgs("Name"));
-                    }
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
                 }
                 else
                 {
@@ -50,10 +48,7 @@ namespace SignalAutoConfigurationTool.EIO
             get { return signalType; }
             set {
                 signalType = value;
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs("SignalType"));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignalType"));
             }
         }
         public string DefaultSignalType
@@ -102,18 +97,16 @@ namespace SignalAutoConfigurationTool.EIO
             get { return deviceMapping; }
             set {
                 deviceMapping = value;
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs("DeviceMapping"));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DeviceMapping"));
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     List<int> deviceMappings = Signal.GetDeviceMappings(value);
+                    //if(this.name== "goLasCleanJobNum")
+                    //{
+                    //    MessageBox.Show("Hello World!");
+                    //}
                     this.numberOfBits= deviceMappings.Count;
-                    if (PropertyChanged != null)
-                    {
-                        PropertyChanged(this, new PropertyChangedEventArgs("NumberOfBits"));
-                    }
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("NumberOfBits"));
                     this.deviceMappingFirst = deviceMappings[0];
                     this.deviceMappingLast = deviceMappings[deviceMappings.Count-1];
                 }
@@ -203,10 +196,7 @@ namespace SignalAutoConfigurationTool.EIO
             get { return index; }
             set {
                 index = value;
-                if (PropertyChanged != null)
-                {
-                    PropertyChanged(this, new PropertyChangedEventArgs("Index"));
-                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Index"));
             }
         }
 
@@ -623,10 +613,21 @@ namespace SignalAutoConfigurationTool.EIO
                 {
                     int deviceMappingStart = int.Parse(strDeviceMapping.Substring(0, indexDash));
                     int deviceMappingEnd = int.Parse(strDeviceMapping.Substring(indexDash + 1));
-                    while (deviceMappingStart <= deviceMappingEnd)
+                    if(deviceMappingStart<= deviceMappingEnd)
                     {
-                        deviceMappings.Add(deviceMappingStart);
-                        deviceMappingStart++;
+                        while (deviceMappingStart <= deviceMappingEnd)
+                        {
+                            deviceMappings.Add(deviceMappingStart);
+                            deviceMappingStart++;
+                        }
+                    }
+                    else
+                    {
+                        while (deviceMappingStart >= deviceMappingEnd)
+                        {
+                            deviceMappings.Add(deviceMappingStart);
+                            deviceMappingStart--;
+                        }
                     }
                 }
             }

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalAutoConfigurationTool", "SignalAutoConfigurationTool\SignalAutoConfigurationTool.csproj", "{9F10BDF3-51FF-44EC-BDDE-3D2EE3EC1CD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNAUSRobotics", "..\CNAUSRobotics\CNAUSRobotics.csproj", "{FBDEE505-BCBE-44A6-A7C1-DEA52F783834}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNAUSRobotics", "CNAUSRobotics\CNAUSRobotics.csproj", "{FBDEE505-BCBE-44A6-A7C1-DEA52F783834}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
