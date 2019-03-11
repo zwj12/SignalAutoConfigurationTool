@@ -69,7 +69,23 @@ namespace SignalAutoConfigurationTool.EIO
         {
             get { return accessLevels; }
             set { accessLevels = value; }
-        }      
+        }
+
+        private Dictionary<string, SystemOutput> systemOutputs;
+
+        public Dictionary<string, SystemOutput> SystemOutputs
+        {
+            get { return systemOutputs; }
+            set { systemOutputs = value; }
+        }
+        
+        private Dictionary<string, SystemInput> systemInputs;
+
+        public Dictionary<string, SystemInput> SystemInputs
+        {
+            get { return systemInputs; }
+            set { systemInputs = value; }
+        }
 
         public Dictionary<string, IndustrialNetwork> GetIndustrialNetworks()
         {
@@ -137,6 +153,20 @@ namespace SignalAutoConfigurationTool.EIO
                 {
                     AccessLevel accessLevel = new EIO.AccessLevel(instanceAccessLevel, this);
                     this.accessLevels.Add(accessLevel.Name, accessLevel);
+                }
+
+                this.systemOutputs = new Dictionary<string, EIO.SystemOutput>();
+                foreach (Instance instanceSystemOutput in controller.Configuration.Domains["EIO"]["SYSSIG_OUT"].GetInstances())
+                {
+                    SystemOutput systemOutput = new EIO.SystemOutput(instanceSystemOutput, this);
+                    this.systemOutputs.Add(systemOutput.ID, systemOutput);
+                }
+
+                this.systemInputs = new Dictionary<string, EIO.SystemInput>();
+                foreach (Instance instanceSystemInput in controller.Configuration.Domains["EIO"]["SYSSIG_IN"].GetInstances())
+                {
+                    SystemInput systemInput = new EIO.SystemInput(instanceSystemInput, this);
+                    this.systemInputs.Add(systemInput.ID, systemInput);
                 }
 
                 foreach (Instance instanceIndustrialNetwork in controller.Configuration.Domains["EIO"]["INDUSTRIAL_NETWORK"].GetInstances())

@@ -1,4 +1,5 @@
 ﻿using ABB.Robotics.Controllers.ConfigurationDomain;
+using log4net;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ namespace SignalAutoConfigurationTool.EIO
 {
     public class Device
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(Device));
+
         private string name;
         /// <summary>
         /// Cfgname:Name
@@ -352,6 +355,11 @@ namespace SignalAutoConfigurationTool.EIO
 
         public void SaveSignalstoCFG()
         {
+            bool hasSystemInput = false;
+            bool hasSystemOutput = false;
+            Dictionary<string, SystemOutput> systemOutputsInThisDevice = new Dictionary<string, SystemOutput>();
+            Dictionary<string, SystemInput> systemInputsInThisDevice = new Dictionary<string, SystemInput>();
+
             SaveFileDialog mySaveFileDialog = new SaveFileDialog();
             mySaveFileDialog.FileName = this.Name + ".cfg";
             mySaveFileDialog.Filter = "EIO files (*.cfg)|*.cfg";
@@ -383,14 +391,29 @@ namespace SignalAutoConfigurationTool.EIO
             }
             myStreamWriter.WriteLine("");
             myStreamWriter.WriteLine(this.GetDeviceCFG());
-
+                       
             myStreamWriter.Write("#\nEIO_SIGNAL:\n");
 
             List<Signal> signals = this.signals.Values.ToList();
             signals.Sort();
 
+
             foreach (Signal signalbase in signals)
-            {
+            {                
+                if (this.connectedtoIndustrialNetwork.FieldBus.SystemOutputs.Count(p => p.Value.SignalName == signalbase.Name)> 0)
+                {
+                    hasSystemOutput=true;
+                    SystemOutput systemOutput = this.connectedtoIndustrialNetwork.FieldBus.SystemOutputs.First(p => p.Value.SignalName == signalbase.Name).Value;
+                    systemOutputsInThisDevice.Add(systemOutput.ID, systemOutput);
+                    //log.Debug("SystemOutput: " + systemOutput.SignalName);
+                }
+                if (this.connectedtoIndustrialNetwork.FieldBus.SystemInputs.Count(p => p.Value.SignalName == signalbase.Name) > 0)
+                {
+                    hasSystemInput = true;
+                    SystemInput systemInput = this.connectedtoIndustrialNetwork.FieldBus.SystemInputs.First(p => p.Value.SignalName == signalbase.Name).Value;
+                    systemInputsInThisDevice.Add(systemInput.ID, systemInput);
+                    //log.Debug("SystemInput: " + systemInput.SignalName);
+                }
                 string strSignalLine= "     ";
                 myStreamWriter.Write("\n");
 
@@ -437,6 +460,29 @@ namespace SignalAutoConfigurationTool.EIO
                 }
 
             }
+
+            //Write section SYSSIG_IN:
+            if (hasSystemInput)
+            {
+                myStreamWriter.Write("#\nSYSSIG_IN:\n");
+                foreach (SystemInput systemInput in systemInputsInThisDevice.Values)
+                {
+                    myStreamWriter.WriteLine("");
+                    myStreamWriter.WriteLine(systemInput.GetSystemInputCFG());
+                }
+            }
+
+            //Write section SYSSIG_OUT:
+            if (hasSystemOutput)
+            {
+                myStreamWriter.Write("#\nSYSSIG_OUT:\n");
+                foreach(SystemOutput systemOutput in systemOutputsInThisDevice.Values)
+                {
+                    myStreamWriter.WriteLine("");
+                    myStreamWriter.WriteLine(systemOutput.GetSystemOutputCFG());
+                }
+            }
+
             myStreamWriter.Close();
             fs.Close();
         }
