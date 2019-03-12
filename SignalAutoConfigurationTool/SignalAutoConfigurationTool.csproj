@@ -81,6 +81,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="EIO\CrossConnection.cs" />
     <Compile Include="EIO\SystemInput.cs" />
     <Compile Include="EIO\SystemOutput.cs" />
     <Compile Include="QueryFilterWindow.xaml.cs">

@@ -26,7 +26,7 @@ namespace SignalAutoConfigurationTool.EIO
                 address = value;
             }
         }
-
+        
         private DeviceNetCommunicationSpeed deviceNetCommunicationSpeed;
         /// <summary>
         /// Cfgname:BaudRate
@@ -69,6 +69,24 @@ namespace SignalAutoConfigurationTool.EIO
             devices = devices.Concat(this.DeviceNetDevices.Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
             devices.Add(this.DeviceNetInternalDevice.Name, this.DeviceNetInternalDevice);
             return devices;
+        }
+
+        public override string GetIndustrialNetworkCFG()
+        {
+            List<string> strPreLines = new List<string>
+            {
+                string.Format("      -Name \"{0}\"", this.Name),
+                string.Format(" -Label \"{0}\"", this.IdentificationLabel),
+                string.Format(" -Address \"{0}\"", this.Address),
+                string.Format(" -BaudRate {0}", (int)this.DeviceNetCommunicationSpeed),
+            };
+
+            StringBuilder strBuilder = new StringBuilder();
+            foreach (string str in strPreLines)
+            {
+                strBuilder.Append(str);
+            }
+            return strBuilder.ToString();
         }
     }
 }

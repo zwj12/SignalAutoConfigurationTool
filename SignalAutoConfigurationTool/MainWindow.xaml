@@ -140,7 +140,8 @@
                             <MenuItem Name="menu_FrozenColumn"  Header="FrozenColumn" Click="menu_FrozenColumn_Click" ></MenuItem>
                             <MenuItem Name="menu_RefreshSignalIndex"  Header="RefreshSignalIndex" Click="menu_RefreshSignalIndex_Click" ></MenuItem>
                             <MenuItem Name="menu_ReArrangeSignalDeviceMappingbyIndex"  Header="ReArrangeDeviceMapping" Click="menu_ReArrangeSignalDeviceMappingbyIndex_Click" ></MenuItem>
-                            <MenuItem Name="menu_SaveSignalstoCFG"  Header="SaveSignalstoCFG" Click="menu_SaveSignalstoCFG_Click"  ></MenuItem>
+                            <MenuItem Name="menu_SaveDeviceSignalstoCFG"  Header="SaveDeviceSignalstoCFG" Click="menu_SaveDeviceSignalstoCFG_Click"  ></MenuItem>
+                            <MenuItem Name="menu_SaveIndustrialNetworkCFG"  Header="SaveIndustrialNetworkCFG" Click="Menu_SaveIndustrialNetworkCFG_Click"   ></MenuItem>
                             <MenuItem Name="menu_ResetSignalTypeByName"  Header="ResetSignalTypeByName" Click="menu_ResetSignalTypeByName_Click"  ></MenuItem>
                             <MenuItem Name="menu_InitAnalogEncoding"  Header="InitAnalogEncoding" Click="menu_InitAnalogEncoding_Click"   ></MenuItem>
                             <MenuItem Name="menu_GetSignalValues"  Header="GetSignalValues" Click="menu_GetSignalValues_Click"   ></MenuItem>

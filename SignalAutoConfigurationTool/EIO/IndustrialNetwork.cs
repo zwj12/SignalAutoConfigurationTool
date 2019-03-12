@@ -70,5 +70,10 @@ namespace SignalAutoConfigurationTool.EIO
             this.fieldBus = fieldBus;
         }
 
+        public virtual string GetIndustrialNetworkCFG()
+        {
+            return null;
+        }
+
     }
 }

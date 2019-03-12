@@ -250,7 +250,7 @@ namespace SignalAutoConfigurationTool
             }
         }
 
-        private void menu_SaveSignalstoCFG_Click(object sender, RoutedEventArgs e)
+        private void menu_SaveDeviceSignalstoCFG_Click(object sender, RoutedEventArgs e)
         {
             this.tree_Devices.Focus();
             object obj = this.dataGrid_signals.Tag;
@@ -411,6 +411,28 @@ namespace SignalAutoConfigurationTool
             //{
             //    MessageBox.Show("Please select a device!");
             //}
+        }
+
+        private void Menu_SaveIndustrialNetworkCFG_Click(object sender, RoutedEventArgs e)
+        {
+            this.tree_Devices.Focus();
+            object obj = this.dataGrid_signals.Tag;
+            if (obj is Device)
+            {
+                ((Device)obj).ConnectedtoIndustrialNetwork.FieldBus.SaveIndustrialNetworkstoCFG();
+            }
+            else if (obj is IndustrialNetwork)
+            {
+                ((IndustrialNetwork)obj).FieldBus.SaveIndustrialNetworkstoCFG();
+            }
+            else if (obj is FieldBus)
+            {
+                ((FieldBus)obj).SaveIndustrialNetworkstoCFG();
+            }
+            else
+            {
+                MessageBox.Show("Please select a device!");             
+            }
         }
     }
 }

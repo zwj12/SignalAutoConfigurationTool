@@ -29,5 +29,22 @@ namespace SignalAutoConfigurationTool.EIO
             Dictionary<string, Device> devices = new Dictionary<string, EIO.Device>();
             return devices;
         }
+
+        public override string GetIndustrialNetworkCFG()
+        {
+            List<string> strPreLines = new List<string>
+            {
+                string.Format("      -Name \"{0}\"", this.Name),
+                string.Format(" -Connection \"{0}\"\\\n", this.Connection),
+                string.Format("      -Label \"{0}\"", this.IdentificationLabel),
+            };
+            
+            StringBuilder strBuilder = new StringBuilder();
+            foreach (string str in strPreLines)
+            {
+                strBuilder.Append(str);
+            }
+            return strBuilder.ToString();
+        }
     }
 }

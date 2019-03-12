@@ -357,11 +357,13 @@ namespace SignalAutoConfigurationTool.EIO
         {
             bool hasSystemInput = false;
             bool hasSystemOutput = false;
+            bool hasCrossConnection = false;
             Dictionary<string, SystemOutput> systemOutputsInThisDevice = new Dictionary<string, SystemOutput>();
             Dictionary<string, SystemInput> systemInputsInThisDevice = new Dictionary<string, SystemInput>();
+            Dictionary<string, CrossConnection> crossConnectionsInThisDevice = new Dictionary<string, CrossConnection>();
 
             SaveFileDialog mySaveFileDialog = new SaveFileDialog();
-            mySaveFileDialog.FileName = this.Name + ".cfg";
+            mySaveFileDialog.FileName ="EIO_" + this.Name + ".cfg";
             mySaveFileDialog.Filter = "EIO files (*.cfg)|*.cfg";
             mySaveFileDialog.RestoreDirectory = true;
             Nullable<bool> result = mySaveFileDialog.ShowDialog();
@@ -397,7 +399,6 @@ namespace SignalAutoConfigurationTool.EIO
             List<Signal> signals = this.signals.Values.ToList();
             signals.Sort();
 
-
             foreach (Signal signalbase in signals)
             {                
                 if (this.connectedtoIndustrialNetwork.FieldBus.SystemOutputs.Count(p => p.Value.SignalName == signalbase.Name)> 0)
@@ -413,6 +414,16 @@ namespace SignalAutoConfigurationTool.EIO
                     SystemInput systemInput = this.connectedtoIndustrialNetwork.FieldBus.SystemInputs.First(p => p.Value.SignalName == signalbase.Name).Value;
                     systemInputsInThisDevice.Add(systemInput.ID, systemInput);
                     //log.Debug("SystemInput: " + systemInput.SignalName);
+                }
+                if (this.connectedtoIndustrialNetwork.FieldBus.CrossConnections.Count(p =>( p.Value.Resultant == signalbase.Name) || (p.Value.Actor1 == signalbase.Name) || (p.Value.Actor2 == signalbase.Name) || (p.Value.Actor3 == signalbase.Name) || (p.Value.Actor4 == signalbase.Name) || (p.Value.Actor5 == signalbase.Name)) > 0)
+                {
+                    hasCrossConnection = true;
+                    CrossConnection crossConnection = this.connectedtoIndustrialNetwork.FieldBus.CrossConnections.First(p => (p.Value.Resultant == signalbase.Name) || (p.Value.Actor1 == signalbase.Name) || (p.Value.Actor2 == signalbase.Name) || (p.Value.Actor3 == signalbase.Name) || (p.Value.Actor4 == signalbase.Name) || (p.Value.Actor5 == signalbase.Name)).Value;
+                    if (!crossConnectionsInThisDevice.ContainsKey(crossConnection.Name))
+                    {
+                        crossConnectionsInThisDevice.Add(crossConnection.Name, crossConnection);
+                        log.Debug("CrossConnection: " + crossConnection.Resultant);
+                    }
                 }
                 string strSignalLine= "     ";
                 myStreamWriter.Write("\n");
@@ -480,6 +491,17 @@ namespace SignalAutoConfigurationTool.EIO
                 {
                     myStreamWriter.WriteLine("");
                     myStreamWriter.WriteLine(systemOutput.GetSystemOutputCFG());
+                }
+            }
+
+            //Write section EIO_CROSS:
+            if (hasCrossConnection)
+            {
+                myStreamWriter.Write("#\nEIO_CROSS:\n");
+                foreach (CrossConnection crossConnection in crossConnectionsInThisDevice.Values)
+                {
+                    myStreamWriter.WriteLine("");
+                    myStreamWriter.WriteLine(crossConnection.GetCrossConnectionCFG());
                 }
             }
 

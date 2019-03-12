@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using log4net;
 using System.Windows;
+using Microsoft.Win32;
+using System.IO;
 
 namespace SignalAutoConfigurationTool.EIO
 {
@@ -79,6 +81,14 @@ namespace SignalAutoConfigurationTool.EIO
             set { systemOutputs = value; }
         }
         
+        private Dictionary<string, CrossConnection> crossConnections;
+
+        public Dictionary<string, CrossConnection> CrossConnections
+        {
+            get { return crossConnections; }
+            set { crossConnections = value; }
+        }
+
         private Dictionary<string, SystemInput> systemInputs;
 
         public Dictionary<string, SystemInput> SystemInputs
@@ -169,6 +179,13 @@ namespace SignalAutoConfigurationTool.EIO
                     this.systemInputs.Add(systemInput.ID, systemInput);
                 }
 
+                this.crossConnections = new Dictionary<string, EIO.CrossConnection>();
+                foreach (Instance instanceCrossConnection in controller.Configuration.Domains["EIO"]["EIO_CROSS"].GetInstances())
+                {
+                    CrossConnection crossConnection = new EIO.CrossConnection(instanceCrossConnection, this);
+                    this.crossConnections.Add(crossConnection.Name, crossConnection);
+                }
+
                 foreach (Instance instanceIndustrialNetwork in controller.Configuration.Domains["EIO"]["INDUSTRIAL_NETWORK"].GetInstances())
                 {
                     switch (instanceIndustrialNetwork.Name)
@@ -238,5 +255,32 @@ namespace SignalAutoConfigurationTool.EIO
             }   
         }
 
+        public void SaveIndustrialNetworkstoCFG()
+        {
+            SaveFileDialog mySaveFileDialog = new SaveFileDialog();
+            mySaveFileDialog.FileName = "EIO_INDUSTRIAL_NETWORK.cfg";
+            mySaveFileDialog.Filter = "EIO files (*.cfg)|*.cfg";
+            mySaveFileDialog.RestoreDirectory = true;
+            Nullable<bool> result = mySaveFileDialog.ShowDialog();
+            if (result == false)
+            {
+                return;
+            }
+            FileStream fs = new FileStream(mySaveFileDialog.FileName, FileMode.Create);
+            StreamWriter myStreamWriter = new StreamWriter(fs);
+            myStreamWriter.Write("EIO:CFG_1.0::\n");
+            myStreamWriter.WriteLine("");
+
+            myStreamWriter.Write("#\nINDUSTRIAL_NETWORK:\n");
+            
+            foreach (IndustrialNetwork industrialNetwork in this.GetIndustrialNetworks().Values)
+            {
+                myStreamWriter.WriteLine("");
+                myStreamWriter.WriteLine(industrialNetwork.GetIndustrialNetworkCFG());
+            }     
+
+            myStreamWriter.Close();
+            fs.Close();
+        }
     }
 }
