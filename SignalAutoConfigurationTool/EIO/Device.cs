@@ -391,6 +391,14 @@ namespace SignalAutoConfigurationTool.EIO
             {
                 myStreamWriter.Write("#\nPROFINET_INTERNAL_DEVICE:\n");
             }
+            else if (this is EtherNetIPDevice)
+            {
+                myStreamWriter.Write("#\nETHERNETIP_DEVICE:\n");
+            }
+            else if (this is EtherNetIPInternalDevice)
+            {
+                myStreamWriter.Write("#\nPROFINET_INTERNAL_DEVICE:\n");
+            }
             myStreamWriter.WriteLine("");
             myStreamWriter.WriteLine(this.GetDeviceCFG());
                        

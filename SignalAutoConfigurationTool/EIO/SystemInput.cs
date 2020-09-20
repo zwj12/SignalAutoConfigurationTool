@@ -12,7 +12,7 @@ namespace SignalAutoConfigurationTool.EIO
     /// </summary>
     public class SystemInput
     {
-        private readonly string id;
+        //private readonly string id;
         /// <summary>
         /// Cfgname:Status & Signal
         /// </summary>

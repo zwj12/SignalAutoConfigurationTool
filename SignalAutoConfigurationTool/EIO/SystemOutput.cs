@@ -12,7 +12,7 @@ namespace SignalAutoConfigurationTool.EIO
     /// </summary>
     public class SystemOutput
     {
-        private string id;
+        //private string id;
         /// <summary>
         /// Cfgname:Status & Signal
         /// </summary>

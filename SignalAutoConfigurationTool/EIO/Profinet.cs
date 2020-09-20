@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace SignalAutoConfigurationTool.EIO
 {
@@ -69,10 +70,16 @@ namespace SignalAutoConfigurationTool.EIO
             this.ConfigurationFile = (string)instanceIndustrialNetwork.GetAttribute("CfgPath");
             this.ProfinetStationName = (string)instanceIndustrialNetwork.GetAttribute("StationName");
             this.NestedDiagnosis = (bool)instanceIndustrialNetwork.GetAttribute("Nesteddiagnosis");
-            foreach (Instance instanceProfinetDevice in instanceIndustrialNetwork.Type.Domain["PROFINET_DEVICE"].GetInstances())
+
+            //If the option is "888-3 PROFINET Device", there will be no section called "PROFINET_DEVICE"
+            if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("PROFINET_DEVICE") >= 0)
             {
-                profinetDevices.Add(instanceProfinetDevice.Name, new ProfinetDevice(instanceProfinetDevice, this));
+                foreach (Instance instanceProfinetDevice in instanceIndustrialNetwork.Type.Domain["PROFINET_DEVICE"].GetInstances())
+                {
+                    profinetDevices.Add(instanceProfinetDevice.Name, new ProfinetDevice(instanceProfinetDevice, this));
+                }
             }
+
             profinetInternalDevice = new ProfinetInternalDevice(instanceIndustrialNetwork.Type.Domain["PROFINET_INTERNAL_DEVICE"].GetInstance("PN_Internal_Device"), this);
 
         }

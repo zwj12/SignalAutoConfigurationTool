@@ -19,14 +19,43 @@ namespace SignalAutoConfigurationTool.EIO
             set { connection = value; }
         }
 
+        private Dictionary<string, EtherNetIPDevice> etherNetIPDevices = new Dictionary<string, EIO.EtherNetIPDevice>();
+
+        public Dictionary<string, EtherNetIPDevice> EtherNetIPDevices
+        {
+            get { return etherNetIPDevices; }
+        }
+
+        private EtherNetIPInternalDevice etherNetIPInternalDevice;
+
+        public EtherNetIPInternalDevice EtherNetIPInternalDevice
+        {
+            get { return etherNetIPInternalDevice; }
+        }
+
         public EtherNetIP(Instance instanceIndustrialNetwork, FieldBus fieldBus) : base(instanceIndustrialNetwork, fieldBus)
         {
             this.Connection = (string)instanceIndustrialNetwork.GetAttribute("Connection");
+
+            foreach (Instance instanceEtherNetIPDevice in instanceIndustrialNetwork.Type.Domain["ETHERNETIP_DEVICE"].GetInstances())
+            {
+                etherNetIPDevices.Add(instanceEtherNetIPDevice.Name, new EtherNetIPDevice(instanceEtherNetIPDevice, this));
+            }
+            //If there is no option of "ETHERNETIP"
+            if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("ETHERNETIP_INTERNAL_DEVICE") >= 0)
+            {
+                etherNetIPInternalDevice = new EtherNetIPInternalDevice(instanceIndustrialNetwork.Type.Domain["ETHERNETIP_INTERNAL_DEVICE"].GetInstance("EN_Internal_Device"), this);
+            }
         }
 
         public override Dictionary<string, Device> GetDevices()
         {
             Dictionary<string, Device> devices = new Dictionary<string, EIO.Device>();
+            devices = devices.Concat(this.EtherNetIPDevices.Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            if (this.EtherNetIPInternalDevice != null)
+            {
+                devices.Add(this.EtherNetIPInternalDevice.Name, this.EtherNetIPInternalDevice);
+            }            
             return devices;
         }
 

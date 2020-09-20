@@ -125,20 +125,6 @@ namespace SignalAutoConfigurationTool.EIO
             get { return "Activated"; }
         }
 
-        private bool simulated;
-        /// <summary>
-        /// Cfgname:Simulated
-        /// </summary>
-        public bool Simulated
-        {
-            get { return simulated; }
-            set { simulated = value; }
-        }
-        public bool DefaultSimulated
-        {
-            get { return false; }
-        }
-
         private int recoveryTime;
         /// <summary>
         /// Cfgname:RecoveryTime
