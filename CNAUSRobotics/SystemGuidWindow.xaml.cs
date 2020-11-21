@@ -62,7 +62,7 @@ namespace CNAUSRobotics
                                 this.myController.Dispose();
                                 this.myController = null;
                             }
-                            this.myController = new Controller(new Guid(this.textBox_systemGuid.Text));
+                            this.myController = Controller.Connect(new Guid(this.textBox_systemGuid.Text), ConnectionType.Standalone);
                             if (string.IsNullOrEmpty(this.textBox_userName.Text))
                             {
                                 this.myController.Logon(UserInfo.DefaultUser);

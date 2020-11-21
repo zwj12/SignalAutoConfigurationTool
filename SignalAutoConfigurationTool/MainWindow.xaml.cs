@@ -21,6 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
+using System.Diagnostics;
 
 namespace SignalAutoConfigurationTool
 { 
@@ -30,6 +31,8 @@ namespace SignalAutoConfigurationTool
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         private FieldBus fieldBus;
 
         public FieldBus FieldBus
@@ -125,6 +128,8 @@ namespace SignalAutoConfigurationTool
 
         private void LoadSignalsFromControllerCFG()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
             try
             {
                 this.fieldBus = new EIO.FieldBus(this.myClass_Controller.controller);
@@ -133,6 +138,10 @@ namespace SignalAutoConfigurationTool
             {
                 throw ex;
             }
+
+            stopwatch.Stop();
+            logger.Debug(stopwatch.ElapsedMilliseconds.ToString());
+
             this.tree_Devices.Items.Clear();
 
             TreeViewItem myTreeViewItem_IOSystem = new TreeViewItem();
@@ -306,7 +315,12 @@ namespace SignalAutoConfigurationTool
 
         private void MenuItem_Test_Click(object sender, RoutedEventArgs e)
         {
-            
+            this.myClass_Controller.TestFileSystem();
+            return;
+            this.myClass_Controller.TestSpeedDataArray();
+            return;
+            this.myClass_Controller.TestSpeedData();
+            return;
             ABB.Robotics.Controllers.IOSystemDomain.Signal signal = this.myClass_Controller.controller.IOSystem.GetSignal("diTest");
             if (signal != null)
             {
@@ -433,6 +447,17 @@ namespace SignalAutoConfigurationTool
             {
                 MessageBox.Show("Please select a device!");             
             }
+        }
+
+        private void MenuItem_RequestWriteAcces_Click(object sender, RoutedEventArgs e)
+        {
+           this.myClass_Controller.RequestWriteAccess();
+
+        }
+
+        private void MenuItem_ReleaseWriteAcces_Click(object sender, RoutedEventArgs e)
+        {
+            this.myClass_Controller.ReleaseWriteAccess();
         }
     }
 }

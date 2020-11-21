@@ -29,6 +29,8 @@
                 <MenuItem Name="MenuItem_Connect" Header="Connect" ToolTip="Connect to a real or virtual controller"   Click="MenuItem_Connect_Click"/>
                 <MenuItem Name="MenuItem_SystemGuid" Header="SystemGuid"  ToolTip="Set the default controller's system guid" Click="MenuItem_SystemGuid_Click" />
                 <MenuItem Name="MenuItem_Test" Header="Test" Click="MenuItem_Test_Click" />
+                <MenuItem Name="MenuItem_RequestWriteAcces" Header="Request Write Access" Click="MenuItem_RequestWriteAcces_Click" />
+                <MenuItem Name="MenuItem_ReleaseWriteAcces" Header="Release Write Access" Click="MenuItem_ReleaseWriteAcces_Click" />
             </MenuItem>
         </Menu>
         <Grid  Grid.Row="1">

@@ -98,7 +98,7 @@ namespace CNAUSRobotics
                 return;            
             }
             ControllerInfo myControllerInfo = (ControllerInfo)this.listView_controllerInfo.SelectedItem;
-            this.myController = new Controller(myControllerInfo);
+            this.myController = Controller.Connect(myControllerInfo,ConnectionType.Standalone);
             this.DialogResult = true;
         }
 
