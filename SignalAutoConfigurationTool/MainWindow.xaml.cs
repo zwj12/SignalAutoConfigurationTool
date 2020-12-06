@@ -315,6 +315,8 @@ namespace SignalAutoConfigurationTool
 
         private void MenuItem_Test_Click(object sender, RoutedEventArgs e)
         {
+            this.myClass_Controller.TestGetPosition();
+            return;
             this.myClass_Controller.TestFileSystem();
             return;
             this.myClass_Controller.TestSpeedDataArray();

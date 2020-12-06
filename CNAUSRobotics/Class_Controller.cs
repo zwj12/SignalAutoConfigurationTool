@@ -9,6 +9,7 @@ using ABB.Robotics.Controllers;
 using ABB.Robotics.Controllers.Discovery;
 using ABB.Robotics.Controllers.FileSystemDomain;
 using ABB.Robotics.Controllers.Hosting;
+using ABB.Robotics.Controllers.MotionDomain;
 using ABB.Robotics.Controllers.RapidDomain;
 using CNAUSRobotics.Symbol;
 
@@ -214,6 +215,19 @@ namespace CNAUSRobotics
                 info = anArray[i];
                 logger.Debug(info.FullName);
             }
+        }
+
+        public void TestGetPosition()
+        {
+            MechanicalUnit mechanicalUnit= this.controller.MotionSystem.ActiveMechanicalUnit;
+            logger.Debug(mechanicalUnit.GetPosition());
+            logger.Debug(mechanicalUnit.GetPosition(CoordinateSystemType.WorkObject));
+            foreach (MechanicalUnit item in this.controller.MotionSystem.MechanicalUnits)
+            {
+                logger.Debug(item.Task.Name + ":" + item.GetPosition());
+                logger.Debug(item.Task.Name + ":" + item.GetPosition(CoordinateSystemType.WorkObject));
+            }
+
         }
     }
 }
