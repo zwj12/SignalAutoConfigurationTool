@@ -94,6 +94,7 @@
     <Compile Include="EIO\CrossConnection.cs" />
     <Compile Include="EIO\EtherNetIPDevice.cs" />
     <Compile Include="EIO\EtherNetIPInternalDevice.cs" />
+    <Compile Include="EIO\LocalDevice.cs" />
     <Compile Include="EIO\SystemInput.cs" />
     <Compile Include="EIO\SystemOutput.cs" />
     <Compile Include="QueryFilterWindow.xaml.cs">

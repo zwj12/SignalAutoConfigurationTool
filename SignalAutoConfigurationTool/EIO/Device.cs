@@ -399,6 +399,10 @@ namespace SignalAutoConfigurationTool.EIO
             {
                 myStreamWriter.Write("#\nPROFINET_INTERNAL_DEVICE:\n");
             }
+            else if (this is LocalDevice)
+            {
+                myStreamWriter.Write("#\nLOCAL_DEVICE:\n");
+            }
             myStreamWriter.WriteLine("");
             myStreamWriter.WriteLine(this.GetDeviceCFG());
                        

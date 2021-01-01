@@ -83,6 +83,7 @@ namespace SignalAutoConfigurationTool.EIO
             profinetInternalDevice = new ProfinetInternalDevice(instanceIndustrialNetwork.Type.Domain["PROFINET_INTERNAL_DEVICE"].GetInstance("PN_Internal_Device"), this);
 
         }
+
         public override Dictionary<string, Device> GetDevices()
         {
             Dictionary<string, Device> devices = new Dictionary<string, EIO.Device>();

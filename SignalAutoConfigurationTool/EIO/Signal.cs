@@ -12,6 +12,8 @@ namespace SignalAutoConfigurationTool.EIO
 {
     public class Signal: IComparable<Signal>, INotifyPropertyChanged
     {
+        private static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         private static string strRegexIdentifier = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
         private string name;
@@ -526,7 +528,7 @@ namespace SignalAutoConfigurationTool.EIO
         public Signal(Instance instanceSignal, Device assignedtoDevice) 
         {
             this.Name = (string)instanceSignal.GetAttribute("Name");
-            this.SignalType = (SignalType)Enum.Parse(typeof(SignalType),(string)instanceSignal.GetAttribute("SignalType"));
+            this.SignalType = (SignalType)Enum.Parse(typeof(SignalType), (string)instanceSignal.GetAttribute("SignalType"));
             this.SignalIdentificationLabel = (string)instanceSignal.GetAttribute("Label");
             this.Category = (string)instanceSignal.GetAttribute("Category");
             if (assignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.AccessLevels.ContainsKey((string)instanceSignal.GetAttribute("Access")))
@@ -556,7 +558,8 @@ namespace SignalAutoConfigurationTool.EIO
             {
                 this.DeviceMapping = strDeviceMapping;
             }
-            this.DefaultValue = (float)instanceSignal.GetAttribute("Default");
+            //this.DefaultValue = (float)instanceSignal.GetAttribute("Default");      
+            this.DefaultValue = (float)instanceSignal["Default"];
             this.FilterTimePassive = (int)instanceSignal.GetAttribute("FiltPas");
             this.FilterTimeActive = (int)instanceSignal.GetAttribute("FiltAct");
             this.InvertPhysicalValue = (bool)instanceSignal.GetAttribute("Invert");

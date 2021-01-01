@@ -140,7 +140,7 @@ namespace SignalAutoConfigurationTool
             }
 
             stopwatch.Stop();
-            logger.Debug(stopwatch.ElapsedMilliseconds.ToString());
+            logger.Debug("LoadSignalsFromControllerCFG: " + stopwatch.ElapsedMilliseconds.ToString());
 
             this.tree_Devices.Items.Clear();
 
