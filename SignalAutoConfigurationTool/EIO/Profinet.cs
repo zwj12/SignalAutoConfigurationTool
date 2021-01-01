@@ -79,8 +79,23 @@ namespace SignalAutoConfigurationTool.EIO
                     profinetDevices.Add(instanceProfinetDevice.Name, new ProfinetDevice(instanceProfinetDevice, this));
                 }
             }
-
             profinetInternalDevice = new ProfinetInternalDevice(instanceIndustrialNetwork.Type.Domain["PROFINET_INTERNAL_DEVICE"].GetInstance("PN_Internal_Device"), this);
+
+            foreach ( ProfinetDevice device in this.profinetDevices.Values)
+            {
+                if (!device.HostDevice.Equals(""))
+                {
+                    if (this.profinetDevices.ContainsKey(device.HostDevice))
+                    {
+                        device.Host = this.profinetDevices[device.HostDevice];
+                        this.profinetDevices[device.HostDevice].Slots.Add(device);
+                        this.profinetDevices[device.HostDevice].Slots.Sort((a, b) =>
+                        {
+                            return a.SlotIndex - b.SlotIndex;
+                        });
+                    }
+                }
+            }
 
         }
 

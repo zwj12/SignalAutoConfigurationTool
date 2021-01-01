@@ -111,6 +111,34 @@ namespace SignalAutoConfigurationTool.EIO
             get { return "DefaultTrustLevel"; }
         }
 
+        private string hostDevice;
+        /// <summary>
+        /// Cfgname:HostDevice
+        /// </summary>
+        public string HostDevice
+        {
+            get { return hostDevice; }
+            set { hostDevice = value; }
+        }
+        public string DefaultHostDevice
+        {
+            get { return ""; }
+        }
+
+        private int slotIndex;
+        /// <summary>
+        /// Cfgname:SlotIndex
+        /// </summary>
+        public int SlotIndex
+        {
+            get { return slotIndex; }
+            set { slotIndex = value; }
+        }
+        public int DefaultSlotIndex
+        {
+            get { return 0; }
+        }
+
         private string stateWhenSystemStartup;
         /// <summary>
         /// Cfgname:StateWhenStartup
@@ -195,6 +223,19 @@ namespace SignalAutoConfigurationTool.EIO
             get { return "Deactivated"; }
         }
 
+        private ProfinetDevice host;
+        public ProfinetDevice Host
+        {
+            get { return host; }
+            set { host = value; }
+        }
+
+        private List<ProfinetDevice> slots = new List<ProfinetDevice>();
+        public List<ProfinetDevice> Slots
+        {
+            get { return slots; }
+        }
+
         public ProfinetDevice(Instance instanceProfinetDevice, IndustrialNetwork connectedtoIndustrialNetwork) :base(instanceProfinetDevice,null, connectedtoIndustrialNetwork)
         {
             this.ProfinetStationName = (string)instanceProfinetDevice.GetAttribute("StationName");
@@ -202,9 +243,16 @@ namespace SignalAutoConfigurationTool.EIO
             this.FastDeviceStartup = (string)instanceProfinetDevice.GetAttribute("FastDeviceStartup");
             this.Simulated = (bool)instanceProfinetDevice.GetAttribute("Simulated");
             this.TrustLevel = (string)instanceProfinetDevice.GetAttribute("TrustLevel");
+            this.HostDevice = (string)instanceProfinetDevice.GetAttribute("HostDevice");
+            this.SlotIndex = (int)instanceProfinetDevice.GetAttribute("SlotIndex");
             this.StateWhenSystemStartup = (string)instanceProfinetDevice.GetAttribute("StateWhenStartup");
             this.RecoveryTime = (int)instanceProfinetDevice.GetAttribute("RecoveryTime");
             if (this.Simulated)
+            {
+                this.ConnectionOutputSize = (int)instanceProfinetDevice.GetAttribute("OutputSize");
+                this.ConnectionInputSize = (int)instanceProfinetDevice.GetAttribute("InputSize");
+            }
+            else
             {
                 this.ConnectionOutputSize = (int)instanceProfinetDevice.GetAttribute("OutputSize");
                 this.ConnectionInputSize = (int)instanceProfinetDevice.GetAttribute("InputSize");
@@ -217,7 +265,27 @@ namespace SignalAutoConfigurationTool.EIO
                 this.Port4 = (string)instanceProfinetDevice.GetAttribute("FastDeviceStartup_Port4");
             }
         }
+
         public override string GetDeviceCFG()
+        {
+            if (this.Slots.Count > 0)
+            {
+                StringBuilder strBuilder = new StringBuilder();
+                strBuilder.Append(this.GetDeviceCFGString());
+                foreach (ProfinetDevice profinetDevice in this.Slots)
+                {
+                    strBuilder.AppendLine("\n");
+                    strBuilder.Append(profinetDevice.GetDeviceCFGString());
+                }
+                return strBuilder.ToString();
+            }
+            else
+            {
+                return this.GetDeviceCFGString();
+            }
+        }
+
+        public string GetDeviceCFGString()
         {
             List<string> strPreLines = new List<string>();
             strPreLines.Add(string.Format("      -Name \"{0}\"", this.Name));
@@ -225,8 +293,12 @@ namespace SignalAutoConfigurationTool.EIO
             FillCfgLines(strPreLines, "VendorName", this.VendorName, this.DefaultVendorName);
             FillCfgLines(strPreLines, "ProductName", this.ProductName, this.DefaultProductName);
             FillCfgLines(strPreLines, "TrustLevel", this.TrustLevel, this.DefaultTrustLevel);
-            FillCfgLines(strPreLines, "OutputSize", this.ConnectionOutputSize, this.DefaultConnectionOutputSize);
-            FillCfgLines(strPreLines, "InputSize", this.ConnectionInputSize, this.DefaultConnectionInputSize);
+            FillCfgLines(strPreLines, "HostDevice", this.HostDevice, this.DefaultHostDevice);
+            FillCfgLines(strPreLines, "SlotIndex", this.SlotIndex, this.DefaultSlotIndex);
+            //FillCfgLines(strPreLines, "OutputSize", this.ConnectionOutputSize, this.DefaultConnectionOutputSize);
+            //FillCfgLines(strPreLines, "InputSize", this.ConnectionInputSize, this.DefaultConnectionInputSize);
+            FillCfgLines(strPreLines, "OutputSize", this.ConnectionOutputSize, -1);
+            FillCfgLines(strPreLines, "InputSize", this.ConnectionInputSize, -1);
             FillCfgLines(strPreLines, "RecoveryTime", this.RecoveryTime, this.DefaultRecoveryTime);
             FillCfgLines(strPreLines, "Simulated", this.Simulated, this.DefaultSimulated);
             FillCfgLines(strPreLines, "StateWhenStartup", this.StateWhenSystemStartup, this.DefaultStateWhenSystemStartup);
@@ -244,5 +316,6 @@ namespace SignalAutoConfigurationTool.EIO
             }
             return strBuilder.ToString();
         }
+        
     }
 }

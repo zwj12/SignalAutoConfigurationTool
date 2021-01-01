@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SignalAutoConfigurationTool.EIO
 {
-    public class Device
+    public class Device : IComparable<Device>
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Device));
 
@@ -373,7 +373,7 @@ namespace SignalAutoConfigurationTool.EIO
             }
             FileStream fs = new FileStream(mySaveFileDialog.FileName, FileMode.Create);
             StreamWriter myStreamWriter = new StreamWriter(fs);
-            myStreamWriter.Write("EIO:CFG_1.0::\n");
+            myStreamWriter.Write("EIO:CFG_1.0::\n\n");
 
             if(this is DeviceNetDevice)
             {
@@ -405,10 +405,21 @@ namespace SignalAutoConfigurationTool.EIO
             }
             myStreamWriter.WriteLine("");
             myStreamWriter.WriteLine(this.GetDeviceCFG());
-                       
-            myStreamWriter.Write("#\nEIO_SIGNAL:\n");
+                        
+            myStreamWriter.Write("\n#\nEIO_SIGNAL:\n");
 
             List<Signal> signals = this.signals.Values.ToList();
+            if (this is ProfinetDevice)
+            {
+                ProfinetDevice obj = (ProfinetDevice)this;
+                if (obj.Slots.Count > 0)
+                {
+                    foreach (ProfinetDevice profinetDevice in obj.Slots)
+                    {
+                        signals.AddRange(profinetDevice.signals.Values.ToList());
+                    }
+                }
+            }
             signals.Sort();
 
             foreach (Signal signalbase in signals)
@@ -487,7 +498,7 @@ namespace SignalAutoConfigurationTool.EIO
             //Write section SYSSIG_IN:
             if (hasSystemInput)
             {
-                myStreamWriter.Write("#\nSYSSIG_IN:\n");
+                myStreamWriter.Write("\n#\nSYSSIG_IN:\n");
                 foreach (SystemInput systemInput in systemInputsInThisDevice.Values)
                 {
                     myStreamWriter.WriteLine("");
@@ -498,7 +509,7 @@ namespace SignalAutoConfigurationTool.EIO
             //Write section SYSSIG_OUT:
             if (hasSystemOutput)
             {
-                myStreamWriter.Write("#\nSYSSIG_OUT:\n");
+                myStreamWriter.Write("\n#\nSYSSIG_OUT:\n");
                 foreach(SystemOutput systemOutput in systemOutputsInThisDevice.Values)
                 {
                     myStreamWriter.WriteLine("");
@@ -509,7 +520,7 @@ namespace SignalAutoConfigurationTool.EIO
             //Write section EIO_CROSS:
             if (hasCrossConnection)
             {
-                myStreamWriter.Write("#\nEIO_CROSS:\n");
+                myStreamWriter.Write("\n#\nEIO_CROSS:\n");
                 foreach (CrossConnection crossConnection in crossConnectionsInThisDevice.Values)
                 {
                     myStreamWriter.WriteLine("");
@@ -682,5 +693,11 @@ namespace SignalAutoConfigurationTool.EIO
                 strPreLines.Add(strIndentation + strParameter);
             }
         }
+
+        public virtual int CompareTo(Device other)
+        {
+            return this.Name.CompareTo(other.Name);
+        }
+
     }
 }
