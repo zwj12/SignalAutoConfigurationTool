@@ -477,7 +477,10 @@ namespace SignalAutoConfigurationTool.EIO
         public double SignalValue
         {
             get { return signalValue; }
-            set { signalValue = value; }
+            set { 
+                signalValue = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("signalValue"));
+            }
         }
 
         private bool littleEndian = false;
@@ -690,6 +693,24 @@ namespace SignalAutoConfigurationTool.EIO
                 this.InputAsPhysical=signal.InputAsPhysical;
                 this.Simulated = signal.State.Simulated;
                 return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// The Access Level must be set to all
+        /// </summary>
+        /// <returns></returns>
+        public bool SetSignalValue()
+        {
+            ABB.Robotics.Controllers.IOSystemDomain.Signal signal = this.AssignedtoDevice.ConnectedtoIndustrialNetwork.FieldBus.Controller.IOSystem.GetSignal(this.Name);
+            if (signal != null)
+            {
+                if(this.AccessLevel.RemoteClientinAutoMode && this.AccessLevel.RemoteClientinManualMode)
+                {
+                    signal.Value = (float)this.SignalValue;
+                    return true;
+                }
             }
             return false;
         }

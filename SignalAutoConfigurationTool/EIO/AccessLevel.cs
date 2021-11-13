@@ -36,7 +36,7 @@ namespace SignalAutoConfigurationTool.EIO
         public bool LocalClientinManualMode
         {
             get { return localClientinManualMode; }
-            set { rapid = value; }
+            set { localClientinManualMode = value; }
         }
 
         private bool localClientinAutoMode;
@@ -46,7 +46,7 @@ namespace SignalAutoConfigurationTool.EIO
         public bool LocalClientinAutoMode
         {
             get { return localClientinAutoMode; }
-            set { rapid = value; }
+            set { localClientinAutoMode = value; }
         }
 
         private bool remoteClientinManualMode;
@@ -56,7 +56,7 @@ namespace SignalAutoConfigurationTool.EIO
         public bool RemoteClientinManualMode
         {
             get { return remoteClientinManualMode; }
-            set { rapid = value; }
+            set { remoteClientinManualMode = value; }
         }
 
         private bool remoteClientinAutoMode;
@@ -66,7 +66,7 @@ namespace SignalAutoConfigurationTool.EIO
         public bool RemoteClientinAutoMode
         {
             get { return remoteClientinAutoMode; }
-            set { rapid = value; }
+            set { remoteClientinAutoMode = value; }
         }
 
         private FieldBus fieldBus;

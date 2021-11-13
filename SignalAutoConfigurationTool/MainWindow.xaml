@@ -133,7 +133,7 @@
                         <DataGridTextColumn Header="MinimumPhysicalValueLimit"  Binding="{Binding Path=MinimumPhysicalValueLimit}"></DataGridTextColumn>
                         <DataGridTextColumn Header="MinimumBitValue"  Binding="{Binding Path=MinimumBitValue}"></DataGridTextColumn>
                         <DataGridCheckBoxColumn Header="LittleEndian"  Binding="{Binding Path=LittleEndian}"></DataGridCheckBoxColumn>
-                        <DataGridTextColumn Header="SignalValue" IsReadOnly="True"  Binding="{Binding Path=SignalValue}"></DataGridTextColumn>
+                        <DataGridTextColumn Header="SignalValue" IsReadOnly="False"  Binding="{Binding Path=SignalValue}"></DataGridTextColumn>
                         <DataGridCheckBoxColumn Header="InputAsPhysical"  Binding="{Binding Path=InputAsPhysical}"></DataGridCheckBoxColumn>
                         <DataGridCheckBoxColumn Header="Simulated"  Binding="{Binding Path=Simulated}"></DataGridCheckBoxColumn>
                     </DataGrid.Columns>
@@ -147,6 +147,7 @@
                             <MenuItem Name="menu_ResetSignalTypeByName"  Header="ResetSignalTypeByName" Click="menu_ResetSignalTypeByName_Click"  ></MenuItem>
                             <MenuItem Name="menu_InitAnalogEncoding"  Header="InitAnalogEncoding" Click="menu_InitAnalogEncoding_Click"   ></MenuItem>
                             <MenuItem Name="menu_GetSignalValues"  Header="GetSignalValues" Click="menu_GetSignalValues_Click"   ></MenuItem>
+                            <MenuItem Name="menu_SetSignalValues"  Header="SetSignalValues" ToolTip="The Access Level must be set to all" Click="menu_SetSignalValues_Click"   ></MenuItem>
                             <MenuItem Name="menu_ExportToExcel"  Header="ExportToExcel" Click="menu_ExportToExcel_Click"  ></MenuItem>
                             <MenuItem Name="menu_QueryFilter"  Header="QueryFilter" Click="menu_QueryFilter_Click" ></MenuItem>
                         </ContextMenu>

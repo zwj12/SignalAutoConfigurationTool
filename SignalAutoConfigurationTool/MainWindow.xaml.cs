@@ -312,12 +312,23 @@ namespace SignalAutoConfigurationTool
                 signal.GetSignalValue();
             }
         }
+        private void menu_SetSignalValues_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.dataGrid_signals.SelectedItems != null)
+            {
+                foreach (var item in this.dataGrid_signals.SelectedItems)
+                {
+                    EIO.Signal signal = (EIO.Signal)item;
+                    signal.SetSignalValue();
+                }
+            }
+        }
 
         private void MenuItem_Test_Click(object sender, RoutedEventArgs e)
         {
-            this.myClass_Controller.TestGetPosition();
-            return;
             this.myClass_Controller.TestFileSystem();
+            return;
+            this.myClass_Controller.TestGetPosition();
             return;
             this.myClass_Controller.TestSpeedDataArray();
             return;
@@ -461,5 +472,7 @@ namespace SignalAutoConfigurationTool
         {
             this.myClass_Controller.ReleaseWriteAccess();
         }
+
+
     }
 }

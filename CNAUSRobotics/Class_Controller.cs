@@ -203,6 +203,8 @@ namespace CNAUSRobotics
             FileSystem fileSystem = this.controller.FileSystem;
             string remoteDir = fileSystem.RemoteDirectory;
             string localDir = fileSystem.LocalDirectory;
+            logger.Debug("remoteDir=" + remoteDir); 
+            logger.Debug("localDir=" + localDir);
             //fileSystem.GetFile("wg.csv", "sd.csv");
             //fileSystem.PutFile("sd.csv", "sd.csv");
             //fileSystem.CopyFile("sd.csv", "sd1.csv", true);
@@ -214,6 +216,12 @@ namespace CNAUSRobotics
             {
                 info = anArray[i];
                 logger.Debug(info.FullName);
+            }
+
+            string yamlPath = fileSystem.RemoteDirectory + "\\" + "yaml";
+            if (fileSystem.FileExists(yamlPath))
+            {
+                // file exists
             }
         }
 
