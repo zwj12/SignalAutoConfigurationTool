@@ -209,7 +209,11 @@ namespace SignalAutoConfigurationTool.EIO
                         this.etherNetIP = new EtherNetIP(domainType.GetInstance("EtherNetIP"), this, controller.IsRobotWare7);
                     }
                     this._virtual = new Virtual1(null, this, controller.IsRobotWare7);
-                    this.local = new Local(null, this,controller.IsRobotWare7);
+
+                    domainType = domain.Types.FirstOrDefault(item => item.Name == "INT_BUS_DEVICE");
+
+                    Instance[] items = domainType.GetInstances();
+                    this.local = new Local(items[0], this,controller.IsRobotWare7);
                 }
                 else
                 {

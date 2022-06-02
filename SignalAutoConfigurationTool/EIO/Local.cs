@@ -55,19 +55,29 @@ namespace SignalAutoConfigurationTool.EIO
         {
             if (isRobotWare7)
             {
-                this.Name = "Local";
+                this.Name = "IntBus";
+                if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("INT_BUS_DEVICE") >= 0)
+                {
+                    //For RobotWare7
+                    foreach (Instance instanceIntBusDevice in instanceIndustrialNetwork.Type.Domain["INT_BUS_DEVICE"].GetInstances())
+                    {
+                        LocalDevices.Add(instanceIntBusDevice.Name, new LocalDevice(instanceIntBusDevice, this, isRobotWare7));
+                    }
+                }
             }
             else
             {
                 if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("LOCAL_DEVICE") >= 0)
                 {
-                    foreach (Instance instanceProfinetDevice in instanceIndustrialNetwork.Type.Domain["LOCAL_DEVICE"].GetInstances())
+                    //For RobotWare6
+                    foreach (Instance instanceLocalDevice in instanceIndustrialNetwork.Type.Domain["LOCAL_DEVICE"].GetInstances())
                     {
-                        LocalDevices.Add(instanceProfinetDevice.Name, new LocalDevice(instanceProfinetDevice, this));
+                        LocalDevices.Add(instanceLocalDevice.Name, new LocalDevice(instanceLocalDevice, this));
                     }
                 }
             }
 
+         
 
             //this.panelDevice = new Device(null, "PANEL", this);
             //this.drv_1Device = new Device(null, "DRV_1", this);

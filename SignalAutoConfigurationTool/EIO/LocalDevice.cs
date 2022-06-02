@@ -10,7 +10,7 @@ namespace SignalAutoConfigurationTool.EIO
 {
     public class LocalDevice : Device
     {
-        public LocalDevice(Instance instanceProfinetDevice, IndustrialNetwork connectedtoIndustrialNetwork) : base(instanceProfinetDevice, null, connectedtoIndustrialNetwork)
+        public LocalDevice(Instance instanceProfinetDevice, IndustrialNetwork connectedtoIndustrialNetwork, bool isRobotWare7 = false) : base(instanceProfinetDevice, null, connectedtoIndustrialNetwork, isRobotWare7)
         {
         }
 
