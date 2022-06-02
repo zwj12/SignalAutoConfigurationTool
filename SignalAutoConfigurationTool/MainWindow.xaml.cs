@@ -265,7 +265,7 @@ namespace SignalAutoConfigurationTool
             object obj = this.dataGrid_signals.Tag;
             if (obj is Device)
             {
-                ((Device)obj).SaveSignalstoCFG();
+                ((Device)obj).SaveSignalstoCFG(myClass_Controller.controller.IsRobotWare7);
             }
             else
             {

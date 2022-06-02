@@ -33,9 +33,16 @@ namespace SignalAutoConfigurationTool.EIO
             get { return etherNetIPInternalDevice; }
         }
 
-        public EtherNetIP(Instance instanceIndustrialNetwork, FieldBus fieldBus) : base(instanceIndustrialNetwork, fieldBus)
+        public EtherNetIP(Instance instanceIndustrialNetwork, FieldBus fieldBus,bool isRobotWare7 = false) : base(instanceIndustrialNetwork, fieldBus, isRobotWare7)
         {
-            this.Connection = (string)instanceIndustrialNetwork.GetAttribute("Connection");
+            if (!isRobotWare7)
+            {
+                this.Connection = instanceIndustrialNetwork.GetAttribute("Connection").ToString();
+            }
+            else
+            {
+                this.Name = "EtherNetIP";
+            }
 
             foreach (Instance instanceEtherNetIPDevice in instanceIndustrialNetwork.Type.Domain["ETHERNETIP_DEVICE"].GetInstances())
             {
@@ -44,10 +51,10 @@ namespace SignalAutoConfigurationTool.EIO
             //If there is no option of "ETHERNETIP"
             if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("ETHERNETIP_INTERNAL_DEVICE") >= 0)
             {
-                etherNetIPInternalDevice = new EtherNetIPInternalDevice(instanceIndustrialNetwork.Type.Domain["ETHERNETIP_INTERNAL_DEVICE"].GetInstance("EN_Internal_Device"), this);
+                etherNetIPInternalDevice = new EtherNetIPInternalDevice(instanceIndustrialNetwork.Type.Domain["ETHERNETIP_INTERNAL_DEVICE"].GetInstance("EN_Internal_Device"), this, isRobotWare7);
             }
         }
-
+        
         public override Dictionary<string, Device> GetDevices()
         {
             Dictionary<string, Device> devices = new Dictionary<string, EIO.Device>();

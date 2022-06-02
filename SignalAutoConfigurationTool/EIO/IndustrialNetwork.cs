@@ -61,15 +61,23 @@ namespace SignalAutoConfigurationTool.EIO
             }
             return signals;
         }
-        
-        public IndustrialNetwork(Instance instanceIndustrialNetwork, FieldBus fieldBus)
+
+        /// <summary>
+        /// For RobotWare6
+        /// </summary>
+        /// <param name="instanceIndustrialNetwork"></param>
+        /// <param name="fieldBus"></param>
+        public IndustrialNetwork(Instance instanceIndustrialNetwork, FieldBus fieldBus, bool isRobotWare7 = false)
         {
-            this.Name = (string)instanceIndustrialNetwork.GetAttribute("Name");
-            this.IdentificationLabel = (string)instanceIndustrialNetwork.GetAttribute("Label");
-            this.Simulated = (bool)instanceIndustrialNetwork.GetAttribute("Simulated");
+            if (!isRobotWare7 && instanceIndustrialNetwork!=null)
+            {
+                this.Name = (string)instanceIndustrialNetwork.GetAttribute("Name");
+                this.IdentificationLabel = (string)instanceIndustrialNetwork.GetAttribute("Label");
+                this.Simulated = (bool)instanceIndustrialNetwork.GetAttribute("Simulated");
+            }
             this.fieldBus = fieldBus;
         }
-
+        
         public virtual string GetIndustrialNetworkCFG()
         {
             return null;

@@ -111,15 +111,18 @@ namespace SignalAutoConfigurationTool.EIO
             this.connectedtoIndustrialNetwork = connectedtoIndustrialNetwork;
         }
 
-        public Device(Instance instanceDevice, string name, IndustrialNetwork connectedtoIndustrialNetwork)
+        public Device(Instance instanceDevice, string name, IndustrialNetwork connectedtoIndustrialNetwork, bool isRobotWare7 = false)
         {
             if (instanceDevice != null)
             {
                 this.Name = (string)instanceDevice.GetAttribute("Name");
                 this.IdentificationLabel = (string)instanceDevice.GetAttribute("Label");
-                this.VendorName = (string)instanceDevice.GetAttribute("VendorName");
-                this.ProductName = (string)instanceDevice.GetAttribute("ProductName");
-                this.Simulated = (bool)instanceDevice.GetAttribute("Simulated");
+                if (!isRobotWare7)
+                {
+                    this.VendorName = (string)instanceDevice.GetAttribute("VendorName");
+                    this.ProductName = (string)instanceDevice.GetAttribute("ProductName");
+                    this.Simulated = (bool)instanceDevice.GetAttribute("Simulated");
+                }
             }
             else
             {
@@ -353,7 +356,7 @@ namespace SignalAutoConfigurationTool.EIO
             return null;
         }
 
-        public void SaveSignalstoCFG()
+        public void SaveSignalstoCFG(bool isRobotWare7 = false)
         {
             bool hasSystemInput = false;
             bool hasSystemOutput = false;
@@ -513,7 +516,7 @@ namespace SignalAutoConfigurationTool.EIO
                 foreach(SystemOutput systemOutput in systemOutputsInThisDevice.Values)
                 {
                     myStreamWriter.WriteLine("");
-                    myStreamWriter.WriteLine(systemOutput.GetSystemOutputCFG());
+                    myStreamWriter.WriteLine(systemOutput.GetSystemOutputCFG(isRobotWare7));
                 }
             }
 

@@ -135,8 +135,14 @@ namespace SignalAutoConfigurationTool.EIO
             {
                 devices = devices.Concat(this.EtherNetIP.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
             }
-            devices = devices.Concat(this.Local.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
-            devices = devices.Concat(this.Virtual.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            if (this.Local != null)
+            {
+                devices = devices.Concat(this.Local.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            }
+            if (this.Virtual != null)
+            {
+                devices = devices.Concat(this.Virtual.GetDevices().Select(x => new KeyValuePair<string, Device>(x.Key, x.Value))).ToDictionary(x => x.Key, y => y.Value);
+            }
             return devices;
         }
 
@@ -194,27 +200,41 @@ namespace SignalAutoConfigurationTool.EIO
                 }
                 logger.Debug("EIO_CROSS: " + stopwatch.ElapsedMilliseconds.ToString());
 
-                foreach (Instance instanceIndustrialNetwork in controller.Configuration.Domains["EIO"]["INDUSTRIAL_NETWORK"].GetInstances())
+                if (controller.IsRobotWare7)
                 {
-                    switch (instanceIndustrialNetwork.Name)
+                    Domain domain = controller.Configuration.Domains["EIO"];
+                    ABB.Robotics.Controllers.ConfigurationDomain.Type domainType = domain.Types.FirstOrDefault(item => item.Name == "ETHERNETIP_NETWORK");
+                    if (domainType != null)
                     {
-                        case "PROFINET":
-                            this.profinet = new Profinet(instanceIndustrialNetwork, this);
-                            break;
-                        case "DeviceNet":
-                            this.deviceNet = new DeviceNet(instanceIndustrialNetwork, this);
-                            break;
-                        case "EtherNetIP":
-                            this.etherNetIP = new EtherNetIP(instanceIndustrialNetwork, this);
-                            break;
-                        case "Local":
-                            this.local = new Local(instanceIndustrialNetwork, this);
-                            break;
-                        case "Virtual":
-                            this._virtual = new Virtual1(instanceIndustrialNetwork, this);
-                            break;
+                        this.etherNetIP = new EtherNetIP(domainType.GetInstance("EtherNetIP"), this, controller.IsRobotWare7);
                     }
+                    this._virtual = new Virtual1(null, this, controller.IsRobotWare7);
+                    this.local = new Local(null, this,controller.IsRobotWare7);
                 }
+                else
+                {
+                    foreach (Instance instanceIndustrialNetwork in controller.Configuration.Domains["EIO"]["INDUSTRIAL_NETWORK"].GetInstances())
+                    {
+                        switch (instanceIndustrialNetwork.Name)
+                        {
+                            case "PROFINET":
+                                this.profinet = new Profinet(instanceIndustrialNetwork, this);
+                                break;
+                            case "DeviceNet":
+                                this.deviceNet = new DeviceNet(instanceIndustrialNetwork, this);
+                                break;
+                            case "EtherNetIP":
+                                this.etherNetIP = new EtherNetIP(instanceIndustrialNetwork, this);
+                                break;
+                            case "Local":
+                                this.local = new Local(instanceIndustrialNetwork, this);
+                                break;
+                            case "Virtual":
+                                this._virtual = new Virtual1(instanceIndustrialNetwork, this);
+                                break;
+                        }
+                    }
+                }             
                 logger.Debug("INDUSTRIAL_NETWORK: " + stopwatch.ElapsedMilliseconds.ToString());
 
                 Dictionary<string, Device> devices = new Dictionary<string, Device>();
@@ -226,9 +246,10 @@ namespace SignalAutoConfigurationTool.EIO
                 foreach (Instance instanceSignal in instances)
                 {                    
                     Device device = null;
-                    if (devices.ContainsKey((string)instanceSignal.GetAttribute("Device")))
+                    object o = instanceSignal.GetAttribute("Device");
+                    if (devices.ContainsKey(instanceSignal.GetAttribute("Device").ToString()))
                     {
-                        device = devices[(string)instanceSignal.GetAttribute("Device")];
+                        device = devices[instanceSignal.GetAttribute("Device").ToString()];
                     }
                     else
                     {

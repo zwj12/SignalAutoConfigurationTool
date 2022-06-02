@@ -51,15 +51,23 @@ namespace SignalAutoConfigurationTool.EIO
             get { return localDevices; }
         }
 
-        public Local(Instance instanceIndustrialNetwork, FieldBus fieldBus) :base(instanceIndustrialNetwork, fieldBus)
+        public Local(Instance instanceIndustrialNetwork, FieldBus fieldBus, bool isRobotWare7 = false) :base(instanceIndustrialNetwork, fieldBus, isRobotWare7)
         {
-            if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("LOCAL_DEVICE") >= 0)
+            if (isRobotWare7)
             {
-                foreach (Instance instanceProfinetDevice in instanceIndustrialNetwork.Type.Domain["LOCAL_DEVICE"].GetInstances())
+                this.Name = "Local";
+            }
+            else
+            {
+                if (instanceIndustrialNetwork.Type.Domain.Types.IndexOf("LOCAL_DEVICE") >= 0)
                 {
-                    LocalDevices.Add(instanceProfinetDevice.Name, new LocalDevice(instanceProfinetDevice, this));
+                    foreach (Instance instanceProfinetDevice in instanceIndustrialNetwork.Type.Domain["LOCAL_DEVICE"].GetInstances())
+                    {
+                        LocalDevices.Add(instanceProfinetDevice.Name, new LocalDevice(instanceProfinetDevice, this));
+                    }
                 }
             }
+
 
             //this.panelDevice = new Device(null, "PANEL", this);
             //this.drv_1Device = new Device(null, "DRV_1", this);

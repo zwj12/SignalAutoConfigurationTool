@@ -51,7 +51,7 @@ namespace SignalAutoConfigurationTool.EIO
             get { return 0; }
         }
 
-        public EtherNetIPInternalDevice(Instance instanceEtherNetIPDevice, IndustrialNetwork connectedtoIndustrialNetwork) : base(instanceEtherNetIPDevice, null, connectedtoIndustrialNetwork)
+        public EtherNetIPInternalDevice(Instance instanceEtherNetIPDevice, IndustrialNetwork connectedtoIndustrialNetwork, bool isRobotWare7 = false) : base(instanceEtherNetIPDevice, null, connectedtoIndustrialNetwork, isRobotWare7)
         {
             this.ConnectionOutputSize = (int)instanceEtherNetIPDevice.GetAttribute("OutputSize");
             this.ConnectionInputSize = (int)instanceEtherNetIPDevice.GetAttribute("InputSize");

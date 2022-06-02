@@ -112,7 +112,14 @@ namespace SignalAutoConfigurationTool.EIO
         {
             this.fieldBus = fieldBus;
             this.Status = (string)instanceSystemOutput.GetAttribute("Status");
-            this.SignalName = (string)instanceSystemOutput.GetAttribute("Signal");
+            if (instanceSystemOutput.Controller.IsRobotWare7)
+            {
+                this.SignalName = (string)instanceSystemOutput.GetAttribute("Name");
+            }
+            else
+            {
+                this.SignalName = (string)instanceSystemOutput.GetAttribute("Signal");
+            }            
             this.Arg1 = instanceSystemOutput.GetAttribute("Arg1").ToString();
             this.Arg2 = instanceSystemOutput.GetAttribute("Arg2").ToString();
             this.Arg3 = instanceSystemOutput.GetAttribute("Arg3").ToString();
@@ -121,13 +128,20 @@ namespace SignalAutoConfigurationTool.EIO
             //this.Arg6 = instanceSystemOutput.GetAttribute("Arg6").ToString();
         }
 
-        public string GetSystemOutputCFG()
+        public string GetSystemOutputCFG(bool IsRobotWare7=false)
         {
             List<string> strPreLines = new List<string>
             {
-                string.Format("      -Status \"{0}\"", this.Status),
-                string.Format(" -Signal \"{0}\"", this.SignalName)
+                string.Format("      -Status \"{0}\"", this.Status),                
             };
+            if (IsRobotWare7)
+            {
+                strPreLines.Add(string.Format(" -Name \"{0}\"", this.SignalName));
+            }
+            else
+            {
+                strPreLines.Add(string.Format(" -Signal \"{0}\"", this.SignalName));
+            }
             switch (this.Status)
             {
                 case "TCPSpeed":

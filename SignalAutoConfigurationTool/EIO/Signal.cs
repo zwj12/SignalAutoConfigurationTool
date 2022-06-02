@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,6 +17,11 @@ namespace SignalAutoConfigurationTool.EIO
 
         private static string strRegexIdentifier = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         private string name;
         /// <summary>
         /// Cfgname:Name
@@ -27,7 +33,8 @@ namespace SignalAutoConfigurationTool.EIO
                 if (Regex.IsMatch(value, strRegexIdentifier))
                 {
                     name = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
+                    OnPropertyChanged();
+                    //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Name"));
                 }
                 else
                 {
@@ -50,7 +57,8 @@ namespace SignalAutoConfigurationTool.EIO
             get { return signalType; }
             set {
                 signalType = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignalType"));
+                OnPropertyChanged();
+                //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SignalType"));
             }
         }
         public string DefaultSignalType
@@ -99,7 +107,8 @@ namespace SignalAutoConfigurationTool.EIO
             get { return deviceMapping; }
             set {
                 deviceMapping = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DeviceMapping"));
+                OnPropertyChanged();
+                //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DeviceMapping"));
                 if (!string.IsNullOrWhiteSpace(value))
                 {
                     List<int> deviceMappings = Signal.GetDeviceMappings(value);
@@ -107,10 +116,13 @@ namespace SignalAutoConfigurationTool.EIO
                     //{
                     //    MessageBox.Show("Hello World!");
                     //}
-                    this.numberOfBits= deviceMappings.Count;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("NumberOfBits"));
-                    this.deviceMappingFirst = deviceMappings[0];
-                    this.deviceMappingLast = deviceMappings[deviceMappings.Count-1];
+                    if (deviceMappings.Count>0)
+                    {
+                        this.numberOfBits = deviceMappings.Count;
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("NumberOfBits"));
+                        this.deviceMappingFirst = deviceMappings[0];
+                        this.deviceMappingLast = deviceMappings[deviceMappings.Count - 1];
+                    }
                 }
                 else
                 {
@@ -156,7 +168,8 @@ namespace SignalAutoConfigurationTool.EIO
                     if (PropertyChanged != null)
                     {
                         PropertyChanged(this, new PropertyChangedEventArgs("DeviceMapping"));
-                        PropertyChanged(this, new PropertyChangedEventArgs("NumberOfBits"));
+                        OnPropertyChanged();
+                        //PropertyChanged(this, new PropertyChangedEventArgs("NumberOfBits"));
                     }
                 }
             }
@@ -198,7 +211,8 @@ namespace SignalAutoConfigurationTool.EIO
             get { return index; }
             set {
                 index = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Index"));
+                OnPropertyChanged();
+                //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Index"));
             }
         }
 
@@ -608,36 +622,42 @@ namespace SignalAutoConfigurationTool.EIO
         static public List<int> GetDeviceMappings(string deviceMapping)
         {
             List<int> deviceMappings = new List<int>();
-            foreach (string strDeviceMapping in deviceMapping.Replace(" ", "").Split(','))
+            try
             {
-                int indexDash = strDeviceMapping.IndexOf('-');
-                if (indexDash == -1)
+                foreach (string strDeviceMapping in deviceMapping.Replace(" ", "").Split(','))
                 {
-                    deviceMappings.Add(int.Parse(strDeviceMapping));
-                }
-                else
-                {
-                    int deviceMappingStart = int.Parse(strDeviceMapping.Substring(0, indexDash));
-                    int deviceMappingEnd = int.Parse(strDeviceMapping.Substring(indexDash + 1));
-                    if(deviceMappingStart<= deviceMappingEnd)
+                    int indexDash = strDeviceMapping.IndexOf('-');
+                    if (indexDash == -1)
                     {
-                        while (deviceMappingStart <= deviceMappingEnd)
-                        {
-                            deviceMappings.Add(deviceMappingStart);
-                            deviceMappingStart++;
-                        }
+                        deviceMappings.Add(int.Parse(strDeviceMapping));
                     }
                     else
                     {
-                        while (deviceMappingStart >= deviceMappingEnd)
+                        int deviceMappingStart = int.Parse(strDeviceMapping.Substring(0, indexDash));
+                        int deviceMappingEnd = int.Parse(strDeviceMapping.Substring(indexDash + 1));
+                        if (deviceMappingStart <= deviceMappingEnd)
                         {
-                            deviceMappings.Add(deviceMappingStart);
-                            deviceMappingStart--;
+                            while (deviceMappingStart <= deviceMappingEnd)
+                            {
+                                deviceMappings.Add(deviceMappingStart);
+                                deviceMappingStart++;
+                            }
+                        }
+                        else
+                        {
+                            while (deviceMappingStart >= deviceMappingEnd)
+                            {
+                                deviceMappings.Add(deviceMappingStart);
+                                deviceMappingStart--;
+                            }
                         }
                     }
                 }
+                deviceMappings.Sort();                
             }
-            deviceMappings.Sort();
+            catch (Exception)
+            {
+            }
             return deviceMappings;
         }
 
@@ -699,6 +719,7 @@ namespace SignalAutoConfigurationTool.EIO
 
         /// <summary>
         /// The Access Level must be set to all
+        /// The vitual input signal(DI, GI, AI) can also be modified by PC-SDK
         /// </summary>
         /// <returns></returns>
         public bool SetSignalValue()
