@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CNAUSRobotics.NetworkScanningWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  Title="NetworkScanningWindow" Height="600" Width="800" Loaded="Window_Loaded">
+  Title="NetworkScanningWindow" Height="600" Width="1200" Loaded="Window_Loaded">
     <Grid>
 
         <DockPanel LastChildFill="true">
@@ -46,10 +46,13 @@
                         <GridViewColumn Header="SystemId" Width="250" DisplayMemberBinding="{Binding Path=SystemId}"/>
                         <GridViewColumn Header="ID" Width="100" DisplayMemberBinding="{Binding Path=Id}"/>
                         <GridViewColumn Header="Availability" Width="80" DisplayMemberBinding="{Binding Path=Availability}"/>
-                        <GridViewColumn Header="Virtual" Width="80" DisplayMemberBinding="{Binding Path=IsVirtual}"/>
-                        <GridViewColumn Header="System Name" Width="150" DisplayMemberBinding="{Binding Path=SystemName}"/>
+                        <GridViewColumn Header="Virtual" Width="60" DisplayMemberBinding="{Binding Path=IsVirtual}"/>
+                        <GridViewColumn Header="System Name" Width="120" DisplayMemberBinding="{Binding Path=SystemName}"/>
                         <GridViewColumn Header="RobotWare Version" Width="120" DisplayMemberBinding="{Binding Path=Version}"/>
                         <GridViewColumn Header="Controller Name" Width="100" DisplayMemberBinding="{Binding Path=ControllerName}"/>
+                        <GridViewColumn Header="RobApi Port" Width="100" DisplayMemberBinding="{Binding Path=RobApiPort}"/>
+                        <GridViewColumn Header="WebServices Port" Width="100" DisplayMemberBinding="{Binding Path=WebServicesPort}"/>
+                        <GridViewColumn Header="NetscanId" Width="80" DisplayMemberBinding="{Binding Path=NetscanId}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
