@@ -38,9 +38,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ABB.Robotics.Controllers.PC, Version=6.8.8307.1040, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ABB.Robotics.Controllers.PC, Version=20.2.9116.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\ABB\SDK\PCSDK 2020\ABB.Robotics.Controllers.PC.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\ABB\SDK\PCSDK 2022\ABB.Robotics.Controllers.PC.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.7.5\lib\net45\NLog.dll</HintPath>
